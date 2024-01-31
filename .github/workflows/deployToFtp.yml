@@ -26,5 +26,5 @@ jobs:
           username: ${{ secrets.ftp_username }}
           password: ${{ secrets.ftp_password }}
           server-dir: public_html/
-          local-dir: ./dist/
+          local-dir: ./dist/mt-tandheelkunde/browser/
           dangerous-clean-slate: true
