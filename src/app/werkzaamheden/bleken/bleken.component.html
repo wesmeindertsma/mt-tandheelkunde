@@ -1,3 +1,34 @@
 <app-header></app-header>
-<p>bleken works!</p>
+<section id="wie-ik-ben" class="wie-ik-ben services">
+  <div class="container">
+    <div class="row">
+      <div id="carouselExampleIndicators" class="col carousel slide">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item" *ngFor="let photo of photos; let i = index" [class.active]="i === 0">
+            <img [src]="photo" class="d-block w-100" alt="...">
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+
+      <div class="col">
+        <h3>Kroon- en brugwerk</h3>
+        <p>
+          Een kroon is een overkappend dopje over een natuurlijke tand of kies en geeft daarmee stevigheid. Soms is een tand of kies zo beschadigd, dat het hersteld moet worden middels een kroon. Een brug wordt gemaakt indien er 1 of meerdere tanden of kiezen missen. Kronen en bruggen zijn bedoeld als duurzame vervangingen voor tanden en kiezen. Ze benaderen de oorspronkelijke vorm, kleur en functie zoveel mogelijk. Ze beschermen en verstevigen de originele tanden.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<app-wat-ik-doe></app-wat-ik-doe>
 <app-contact></app-contact>

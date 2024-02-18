@@ -1,18 +1,11 @@
 <div class="container">
-  <div class="row">
-    <div class="col-sm-6 col-md-4 col-lg-3" *ngFor="let card of cards">
-      <div class="card d-flex flex-column">
-        <img [src]="card.imageUrl" class="card-img-top" alt="Card Image">
-        <div class="card-body">
-          <h5 class="card-title">{{ card.titel }}</h5>
-          <p class="card-text card-description">{{ card.omschrijving | truncate: 10}}</p>
-        </div>
-        <div class="card-footer">
-          <a [routerLink]="[card.url]">
-            Lees meer
-          </a>
-        </div>
+  <div class="card-deck d-block d-md-flex">
+    <a *ngFor="let card of cards" [routerLink]="card.url" class="card mb-4">
+      <img [src]="card.imageUrl" class="card-img-top" alt="Card Image">
+      <div class="card-body pt-3">
+        <h5 class="card-title">{{ card.titel }}</h5>
+        <p class="small card-text text-muted">{{ card.omschrijving | truncate: 8 }}</p>
       </div>
-    </div>
+    </a>
   </div>
 </div>

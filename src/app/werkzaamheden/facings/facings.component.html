@@ -1,3 +1,55 @@
 <app-header></app-header>
-<p>facings works!</p>
+<section id="wie-ik-ben" class="wie-ik-ben services">
+  <div class="container">
+    <div class="row">
+      <div id="carouselExampleIndicators" class="col carousel slide">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item" *ngFor="let photo of photos; let i = index" [class.active]="i === 0">
+            <img [src]="photo" class="d-block w-100" alt="...">
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+
+      <div class="col">
+        <h3>Facings</h3>
+        <p>
+          Een kroon is een overkappend dopje over een natuurlijke tand of kies en geeft daarmee stevigheid. Soms is een tand of kies zo beschadigd, dat het hersteld moet worden middels een kroon. Een brug wordt gemaakt indien er 1 of meerdere tanden of kiezen missen. Kronen en bruggen zijn bedoeld als duurzame vervangingen voor tanden en kiezen. Ze benaderen de oorspronkelijke vorm, kleur en functie zoveel mogelijk. Ze beschermen en verstevigen de originele tanden.         </p>
+        <h2>
+          Verschil tussen facing en kroon
+        </h2>
+        <p>
+          Een facing is niet hetzelfde als een kroon; bij een kroon wordt er een kapje over de gehele tand of kies geplaatst, bij een facing wordt er een schildje tegen de tand of kies geplaatst. Voor een kroon moet er veel tandweefsel worden opgeofferd, voor een facing veel minder of soms helemaal niets.
+        </p>
+        <h2>
+          Werkwijze composiet
+        </h2>
+        <p>
+          Allereerst wordt er naar het gehele gebit gekeken tijdens een intake. Daarna wordt er een behandelplan met begroting opgesteld. Er kan gekozen worden uit facings die met een mal vervaardigd worden of uit de hand. De mal techniek wordt met behulp van 'digital smile design' vervaardigd, waardoor u van te voren al een idee krijgt hoe de tanden eruit komen te zien. Indien de facings uit de hand worden gemaakt dan is dit in 1 sessie klaar. Voor porseleinen facings wordt er altijd een smile design gemaakt.
+        </p>
+        <h2>
+          Kosten indicatie
+        </h2>
+        <p>
+          Smile design: 400 euro
+          Composieten facings: 150-200 euro per tand of kies
+          Porseleinen facigns: 500 euro per tand
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<app-wat-ik-doe></app-wat-ik-doe>
 <app-contact></app-contact>

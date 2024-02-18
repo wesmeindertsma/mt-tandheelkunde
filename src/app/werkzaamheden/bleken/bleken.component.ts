@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, Input} from '@angular/core';
 
 @Component({
   selector: 'app-bleken',
@@ -6,5 +6,7 @@ import { Component } from '@angular/core';
   styleUrl: './bleken.component.css'
 })
 export class BlekenComponent {
-
+  @Input() photos: string[] = [
+    'assets/img/bleken/bleken.jpeg',
+  ];
 }

@@ -1,3 +1,42 @@
-<app-header></app-header>
-<p>slijtage-behandeling works!</p>
+<app-header xmlns="http://www.w3.org/1999/html"></app-header>
+<section id="wie-ik-ben" class="wie-ik-ben services">
+  <div class="container">
+    <div class="row">
+      <div id="carouselExampleIndicators" class="col carousel slide">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item" *ngFor="let photo of photos; let i = index" [class.active]="i === 0">
+            <img [src]="photo" class="d-block w-100" alt="...">
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+
+      <div class="col">
+        <h3>Gebitslijtage</h3>
+        <p>
+          Gebitsslijtage ontstaat door verlies van tandweefsel door oorzaken anders dan cariës (gaatjes, tandbederf). Het komt bij iedereen voor en is in de loop van de tijd bij iedereen waarneembaar (normale, fysiologische slijtage). Soms verloopt de slijtage echter sneller dan normaal (pathologische slijtage). De tanden en kiezen worden dan steeds korter. Het glazuur slijt allereerst in, met daaronder het tandbeen. Indien het tandbeen bloot ligt zal de slijtage extra snel voortschrijden. Het is zaak om op tijd de (pathologische) slijtage te signaleren en te behandelen indien nodig.
+        </p>
+        <h3>
+          Werkwijze
+        </h3>
+        <p>
+          Tijdens een intake wordt de mate van slijtage in kaart gebracht en een passend behandelplan opgesteld. Meestal worden er afdrukken gemaakt, afhankelijk van de mate van de slijtage en de omvang van het behandelplan. De slijtage wordt meestal in eerste instantie hersteld door middel van een laagje composiet over de tand of kies. Indien na een aantal jaren blijkt dat het composiet snel slijt, kan het composiet omgezet worden in porselein. Indien er sprake is van weinig slijtage, wordt de slijtage hersteld door dit 'uit de hand' te maken. Indien het gaat om een omvangrijk slijtage plan wordt er eerst een digital smile design gemaakt. Daarna wordt de slijtage met behulp van mallen opgebouwd.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<app-wat-ik-doe></app-wat-ik-doe>
 <app-contact></app-contact>
