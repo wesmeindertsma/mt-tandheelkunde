@@ -8,7 +8,7 @@
           <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
           <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
         </div>
-        <div class="carousel-inner">
+        <div class="carousel-inner d-flex align-items-center">
           <div class="carousel-item" *ngFor="let photo of photos; let i = index" [class.active]="i === 0">
             <img [src]="photo" class="d-block w-100" alt="...">
           </div>

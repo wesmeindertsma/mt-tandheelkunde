@@ -626,4 +626,22 @@ ol, li {
   padding: 0;
 }
 
+/*#carouselExampleIndicators {*/
+/*  background-color: #A9D4D9;*/
+/*}*/
 
+.carousel-inner {
+  display: flex;
+  align-items: center;
+  height: 100%; /* Volledige hoogte van de carousel */
+}
+
+.carousel-item {
+  overflow: hidden; /* Om de afbeelding bij te snijden als deze te groot is */
+}
+
+.carousel-item img {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: cover; /* Bijsnijden van de afbeelding om deze binnen het carousel-item te passen */
+}
