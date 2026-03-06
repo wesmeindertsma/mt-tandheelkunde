@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { AfspraakComponent } from './afspraak/afspraak.component';
 import { HomeComponent } from './home/home.component';
 import { CardsComponent } from './home/wat-ik-doe/cards/cards.component';
 import { WieIkBenComponent } from './home/wie-ik-ben/wie-ik-ben.component';
@@ -16,7 +18,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { ContactComponent } from './components/contact/contact.component';
 import {InMemoryWebApiModule} from "angular-in-memory-web-api";
 import {InMemoryDataService} from "./in-memory-data.service";
-import {HttpClientModule} from "@angular/common/http";
+import {provideHttpClient, withInterceptorsFromDi} from "@angular/common/http";
 import {TruncatePipe} from "./werkzaamheden/truncate.pipe";
 
 @NgModule({
@@ -33,16 +35,18 @@ import {TruncatePipe} from "./werkzaamheden/truncate.pipe";
     HeaderComponent,
     NavbarComponent,
     ContactComponent,
-    TruncatePipe,
+    AfspraakComponent,
     TruncatePipe,
   ],
   imports: [
     BrowserModule,
-    HttpClientModule,
+    ReactiveFormsModule,
     InMemoryWebApiModule.forRoot(InMemoryDataService),
     AppRoutingModule
   ],
-  providers: [],
+  providers: [
+    provideHttpClient(withInterceptorsFromDi())
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
