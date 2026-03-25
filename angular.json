@@ -33,7 +33,7 @@
             "assets": [
               "src/favicon.ico",
               "src/favicon.svg",
-              { "glob": "htaccess", "input": "src", "output": "/", "rename": ".htaccess" },
+              "src/.htaccess",
               "src/assets"
             ],
             "styles": [
