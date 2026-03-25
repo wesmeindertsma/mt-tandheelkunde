@@ -1,6 +1,7 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-bleken',
   templateUrl: './bleken.component.html',
   styleUrl: './bleken.component.css'

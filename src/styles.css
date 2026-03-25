@@ -27,6 +27,13 @@
 }
 
 /* ================================================================
+   Scroll offset voor vaste navbar
+================================================================ */
+section[id] {
+  scroll-margin-top: 80px;
+}
+
+/* ================================================================
    Reset & Base
 ================================================================ */
 *, *::before, *::after {
@@ -131,8 +138,9 @@ ol, ul { list-style: none; margin: 0; padding: 0; }
   font-weight: 500;
   color: var(--clr-text);
   white-space: nowrap;
-  transition: var(--transition);
+  transition: color 0.25s ease, transform 0.25s ease, background 0.25s ease;
   border-radius: var(--radius-sm);
+  position: relative;
 }
 
 .navbar a i,
@@ -142,12 +150,38 @@ ol, ul { list-style: none; margin: 0; padding: 0; }
   margin-left: 4px;
 }
 
+/* Animerende onderstreep voor .nav-link items */
+.navbar a.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--clr-primary);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar a.nav-link:hover::after,
+.navbar .active.nav-link::after {
+  transform: scaleX(1);
+}
+
 .navbar a:hover,
 .navbar .active,
 .navbar .active:focus,
 .navbar li:hover > a {
   color: var(--clr-primary);
-  background: var(--clr-primary-xlight);
+  background: transparent;
+  transform: translateY(-1px);
+}
+
+/* Afspraak-knop heeft eigen hover-stijl — geen lift/underline */
+.navbar .btn-afspraak:hover {
+  transform: none;
 }
 
 /* Dropdown */

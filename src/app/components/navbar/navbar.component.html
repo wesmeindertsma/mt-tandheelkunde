@@ -7,21 +7,11 @@
 
     <nav id="navbar" class="navbar order-last order-lg-0">
       <ul>
-        <li><a class="nav-link" routerLink="/home" fragment="wie-ik-ben">Wie ben ik</a></li>
-        <li class="dropdown">
-          <a class="nav-link" routerLink="/home" fragment="wat-ik-doe">
-            <span>Behandelingen</span>
-            <i class="bi bi-chevron-down"></i>
-          </a>
-          <ul>
-            <li><a routerLink="/facings">Facings</a></li>
-            <li><a routerLink="/slijtage">Gebitsslijtage</a></li>
-            <li><a routerLink="/kroon-brugwerk">Kroon- en brugwerk</a></li>
-            <li><a routerLink="/bleken">Bleken</a></li>
-          </ul>
-        </li>
-        <li><a class="nav-link" routerLink="/contact">Contact</a></li>
-        <li><a class="btn-afspraak" routerLink="/afspraak">
+        <li><a class="nav-link" style="cursor:pointer" (click)="scrollTo('wie-ik-ben')">Wie ben ik</a></li>
+        <li><a class="nav-link" style="cursor:pointer" (click)="scrollTo('wat-ik-doe')">Behandelingen</a></li>
+        <li><a class="nav-link" style="cursor:pointer" (click)="scrollTo('portfolio')">Portfolio</a></li>
+        <li><a class="nav-link" style="cursor:pointer" (click)="scrollTo('contact')">Contact</a></li>
+        <li><a class="btn-afspraak" style="cursor:pointer" (click)="scrollTo('afspraak')">
           <i class="bi bi-calendar-check me-1"></i>Afspraak
         </a></li>
       </ul>

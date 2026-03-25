@@ -5,6 +5,20 @@
       <h2>Wat ik doe</h2>
       <p>Ik ben gespecialiseerd in restauratieve en esthetische tandheelkunde. Bekijk de behandelingen die ik aanbied.</p>
     </div>
-    <app-cards [cards]="werkzaamheden"></app-cards>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      <div class="col" *ngFor="let b of behandelingen">
+        <div class="behandeling-card">
+          <div class="behandeling-card-img">
+            <img [src]="b.foto" [alt]="b.titel">
+          </div>
+          <div class="behandeling-card-body">
+            <h5>{{ b.titel }}</h5>
+            <p>{{ b.beschrijving }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>

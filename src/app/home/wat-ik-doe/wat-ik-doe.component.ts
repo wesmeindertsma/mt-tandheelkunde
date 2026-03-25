@@ -1,35 +1,18 @@
-import {Component, OnInit} from '@angular/core';
-import {CardService} from "./cards/card.service";
-import {Card} from "./cards/card";
+import { Component, OnInit } from '@angular/core';
+import { BehandelingCard, DataService } from '../../services/data.service';
 
 @Component({
+  standalone: false,
   selector: 'app-wat-ik-doe',
   templateUrl: './wat-ik-doe.component.html',
   styleUrl: './wat-ik-doe.component.css'
 })
-export class WatIkDoeComponent implements OnInit{
-  werkzaamheden?: Card[];
+export class WatIkDoeComponent implements OnInit {
+  behandelingen: BehandelingCard[] = [];
 
-  constructor(private cardService: CardService) {
-  }
+  constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
-    this.getWerkzaamheden();
-  }
-
-  private getWerkzaamheden(): void {
-    const result = this.cardService.getWerkzaamheden();
-
-    result.subscribe({
-      next: (cards: Card[]) =>  {
-        this.werkzaamheden = cards;
-      },
-      error: (err: Error) => {
-        // do something with an error...
-      },
-      complete: () => {
-        // do something when the observer completes, often not needed....
-      }
-    });
+    this.behandelingen = this.dataService.getBehandelingen();
   }
 }

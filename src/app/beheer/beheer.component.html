@@ -1,0 +1,272 @@
+<!-- ─── Login ─────────────────────────────────────────── -->
+<div class="beheer-login" *ngIf="!ingelogd">
+  <div class="login-card">
+    <div class="login-logo">MT Tandheelkunde</div>
+    <h2>Beheer</h2>
+    <p class="login-sub">Log in met uw Google-account om door te gaan.</p>
+    <div id="google-signin-btn" class="google-btn-wrapper"></div>
+    <div class="alert alert-danger mt-3 py-2 text-center" *ngIf="loginFout">
+      <i class="bi bi-shield-exclamation me-1"></i>{{ loginFout }}
+    </div>
+  </div>
+</div>
+
+<!-- ─── Admin panel ───────────────────────────────────── -->
+<div class="beheer-panel" *ngIf="ingelogd">
+
+  <!-- Header -->
+  <div class="beheer-header">
+    <span class="beheer-title">MT Tandheelkunde – Beheer</span>
+    <button class="btn-uitloggen" (click)="uitloggen()">
+      <i class="bi bi-box-arrow-right me-1"></i>Uitloggen
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="beheer-tabs">
+    <button class="tab-btn" [class.active]="actieveTab === 'portfolio'" (click)="actieveTab = 'portfolio'">
+      <i class="bi bi-images me-1"></i>Portfolio
+    </button>
+    <button class="tab-btn" [class.active]="actieveTab === 'behandelingen'" (click)="actieveTab = 'behandelingen'">
+      <i class="bi bi-card-list me-1"></i>Behandelingen
+    </button>
+    <button class="tab-btn" [class.active]="actieveTab === 'instellingen'" (click)="actieveTab = 'instellingen'">
+      <i class="bi bi-gear me-1"></i>Instellingen
+    </button>
+  </div>
+
+  <div class="beheer-content">
+
+    <!-- ─── Tab: Portfolio ─────────────────────────────── -->
+    <div *ngIf="actieveTab === 'portfolio'">
+
+      <div class="tab-intro">
+        <p>Beheer de foto-cases in het portfolio. Elke case heeft een naam (behandeling) en één of meerdere foto's met optionele beschrijving.</p>
+        <p class="text-muted small"><i class="bi bi-info-circle me-1"></i>Foto's kunnen worden geüpload vanuit uw apparaat (worden gecomprimeerd opgeslagen). Klik op "Opslaan" onderaan om wijzigingen door te voeren.</p>
+      </div>
+
+      <button class="btn-add" (click)="nieuwCase()">
+        <i class="bi bi-plus-lg me-1"></i>Nieuwe case toevoegen
+      </button>
+
+      <div class="case-card" *ngFor="let c of portfolioCases; let ci = index; trackBy: trackCase">
+        <div class="case-header">
+          <div class="case-naam-row">
+            <input
+              class="case-naam-input"
+              type="text"
+              [value]="c.behandeling"
+              (input)="c.behandeling = $any($event.target).value"
+              placeholder="Naam behandeling (bijv. Facings)">
+            <div class="case-actions">
+              <button class="btn-icon" title="Omhoog" (click)="verplaatsCase(ci, -1)" [disabled]="ci === 0">
+                <i class="bi bi-arrow-up"></i>
+              </button>
+              <button class="btn-icon" title="Omlaag" (click)="verplaatsCase(ci, 1)" [disabled]="ci === portfolioCases.length - 1">
+                <i class="bi bi-arrow-down"></i>
+              </button>
+              <button class="btn-icon danger" title="Case verwijderen" (click)="verwijderCase(ci)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="foto-list">
+          <div class="foto-row" *ngFor="let f of c.fotos; let fi = index; trackBy: trackFoto">
+
+            <div class="foto-preview-wrap">
+              <img *ngIf="f.src" [src]="f.src" class="foto-preview" [alt]="'Foto ' + (fi+1)">
+              <div class="foto-preview-empty" *ngIf="!f.src">
+                <i class="bi bi-image"></i>
+              </div>
+              <label class="foto-upload-btn" [for]="'upload-' + c.id + '-' + f.id" title="Foto uploaden">
+                <i class="bi bi-cloud-upload"></i>
+                <input
+                  [id]="'upload-' + c.id + '-' + f.id"
+                  type="file"
+                  accept="image/*"
+                  class="d-none"
+                  (change)="uploadPortfolioFoto(ci, fi, $event)">
+              </label>
+            </div>
+
+            <div class="foto-meta">
+              <input
+                class="form-control form-control-sm"
+                type="text"
+                [value]="f.caption"
+                (input)="f.caption = $any($event.target).value"
+                placeholder="Beschrijving / caption (optioneel)">
+            </div>
+
+            <div class="foto-acties">
+              <button
+                class="btn-icon"
+                [class.thumbnail-active]="isThumbnail(ci, f.id)"
+                [title]="isThumbnail(ci, f.id) ? 'Huidige thumbnail' : 'Gebruik als thumbnail'"
+                (click)="setThumbnail(ci, f.id)">
+                <i class="bi bi-star-fill" *ngIf="isThumbnail(ci, f.id)"></i>
+                <i class="bi bi-star" *ngIf="!isThumbnail(ci, f.id)"></i>
+              </button>
+              <button class="btn-icon" title="Omhoog" (click)="verplaatsFoto(ci, fi, -1)" [disabled]="fi === 0">
+                <i class="bi bi-arrow-up"></i>
+              </button>
+              <button class="btn-icon" title="Omlaag" (click)="verplaatsFoto(ci, fi, 1)" [disabled]="fi === c.fotos.length - 1">
+                <i class="bi bi-arrow-down"></i>
+              </button>
+              <button class="btn-icon danger" title="Foto verwijderen" (click)="verwijderFoto(ci, fi)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <button class="btn-add-foto" (click)="nieuweFoto(ci)">
+          <i class="bi bi-plus me-1"></i>Foto toevoegen
+        </button>
+
+        <!-- Delen -->
+        <div class="delen-toggle-row">
+          <button class="btn-delen" (click)="toggleDelen(c)">
+            <i class="bi bi-share me-1"></i>Delen
+            <i class="bi" [class.bi-chevron-down]="!delenOpen[c.id]" [class.bi-chevron-up]="delenOpen[c.id]"></i>
+          </button>
+        </div>
+
+        <div class="delen-panel" *ngIf="delenOpen[c.id]">
+          <label class="form-label-sm">Post tekst</label>
+          <textarea class="form-control delen-textarea" rows="6" [(ngModel)]="delenTekst[c.id]"></textarea>
+
+          <div class="delen-knoppen">
+            <button class="btn-platform facebook" (click)="delenOp('facebook', c.id)">
+              <i class="bi bi-facebook me-1"></i>Facebook
+              <span *ngIf="gekopieerd[c.id + 'facebook']" class="kopie-ok">✓ Gekopieerd</span>
+            </button>
+            <button class="btn-platform linkedin" (click)="delenOp('linkedin', c.id)">
+              <i class="bi bi-linkedin me-1"></i>LinkedIn
+              <span *ngIf="gekopieerd[c.id + 'linkedin']" class="kopie-ok">✓ Gekopieerd</span>
+            </button>
+            <button class="btn-platform instagram" (click)="delenOp('instagram', c.id)">
+              <i class="bi bi-instagram me-1"></i>Instagram
+              <span *ngIf="gekopieerd[c.id + 'instagram']" class="kopie-ok">✓ Gekopieerd</span>
+            </button>
+          </div>
+          <p class="delen-instagram-hint text-muted small">
+            <i class="bi bi-info-circle me-1"></i>Instagram: tekst is gekopieerd — open de Instagram-app en plak de tekst bij uw bericht.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ─── Tab: Behandelingen ─────────────────────────── -->
+    <div *ngIf="actieveTab === 'behandelingen'">
+
+      <div class="tab-intro">
+        <p>Beheer de behandelingskaartjes op de homepagina (sectie "Wat ik doe").</p>
+      </div>
+
+      <button class="btn-add" (click)="nieuweBehandeling()">
+        <i class="bi bi-plus-lg me-1"></i>Behandeling toevoegen
+      </button>
+
+      <div class="behandeling-card-admin" *ngFor="let b of behandelingen; let bi = index; trackBy: trackBehandeling">
+
+        <div class="beh-foto-col">
+          <img *ngIf="b.foto" [src]="b.foto" class="beh-preview" [alt]="b.titel">
+          <div class="foto-preview-empty" *ngIf="!b.foto"><i class="bi bi-image"></i></div>
+          <label class="foto-upload-btn" [for]="'beh-upload-' + b.id">
+            <i class="bi bi-cloud-upload"></i>
+            <input
+              [id]="'beh-upload-' + b.id"
+              type="file"
+              accept="image/*"
+              class="d-none"
+              (change)="uploadBehandelingFoto(bi, $event)">
+          </label>
+        </div>
+
+        <div class="beh-meta-col">
+          <div class="mb-2">
+            <label class="form-label-sm">Titel</label>
+            <input
+              class="form-control"
+              type="text"
+              [value]="b.titel"
+              (input)="b.titel = $any($event.target).value"
+              placeholder="Titel behandeling">
+          </div>
+          <div>
+            <label class="form-label-sm">Beschrijving</label>
+            <textarea
+              class="form-control"
+              rows="3"
+              [value]="b.beschrijving"
+              (input)="b.beschrijving = $any($event.target).value"
+              placeholder="Korte beschrijving van de behandeling">
+            </textarea>
+          </div>
+        </div>
+
+        <div class="beh-acties-col">
+          <button class="btn-icon danger" title="Verwijderen" (click)="verwijderBehandeling(bi)">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ─── Tab: Instellingen ──────────────────────────── -->
+    <div *ngIf="actieveTab === 'instellingen'" class="instellingen-tab">
+
+      <div class="instelling-blok">
+        <h4>Ingelogd als</h4>
+        <div class="account-info">
+          <i class="bi bi-person-circle"></i>
+          <div>
+            <strong>{{ userName }}</strong>
+            <span>{{ userEmail }}</span>
+          </div>
+        </div>
+        <button class="btn-danger-outline mt-3" (click)="uitloggen()">
+          <i class="bi bi-box-arrow-right me-1"></i>Uitloggen
+        </button>
+        <p class="text-muted small mt-3">
+          Toegang wordt beheerd via Google OAuth2. Om een ander account toe te voegen, pas
+          <code>toegestaneEmails</code> aan in <code>beheer.config.ts</code>.
+        </p>
+      </div>
+
+      <div class="instelling-blok danger-zone">
+        <h4>Gegevens terugzetten</h4>
+        <p class="text-muted small">Hiermee worden alle portfolio- en behandelingswijzigingen teruggedraaid naar de standaardinstellingen. Dit kan niet ongedaan worden gemaakt.</p>
+        <div *ngIf="!resetBevestiging">
+          <button class="btn-danger-outline" (click)="resetBevestigen()">
+            Terugzetten naar standaard
+          </button>
+        </div>
+        <div *ngIf="resetBevestiging" class="reset-confirm">
+          <p><strong>Weet u het zeker?</strong></p>
+          <button class="btn-danger" (click)="resetUitvoeren()">Ja, terugzetten</button>
+          <button class="btn-cancel ms-2" (click)="resetBevestiging = false">Annuleren</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /beheer-content -->
+
+  <!-- Opslaan balk -->
+  <div class="beheer-footer" *ngIf="actieveTab !== 'instellingen'">
+    <div class="opslaan-melding" *ngIf="opslaanMelding">
+      <i class="bi bi-check-circle me-2"></i>{{ opslaanMelding }}
+    </div>
+    <button class="btn-opslaan" (click)="opslaan()">
+      <i class="bi bi-floppy me-2"></i>Opslaan
+    </button>
+  </div>
+
+</div><!-- /beheer-panel -->

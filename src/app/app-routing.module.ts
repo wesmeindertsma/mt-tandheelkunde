@@ -1,26 +1,26 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import {HomeComponent} from "./home/home.component";
-import {BlekenComponent} from "./werkzaamheden/bleken/bleken.component";
-import {ContactComponent} from "./components/contact/contact.component";
-import {SlijtageBehandelingComponent} from "./werkzaamheden/slijtage-behandeling/slijtage-behandeling.component";
-import {KroonBrugwerkComponent} from "./werkzaamheden/kroon-brugwerk/kroon-brugwerk.component";
-import {FacingsComponent} from "./werkzaamheden/facings/facings.component";
-import {AfspraakComponent} from "./afspraak/afspraak.component";
+import { HomeComponent } from './home/home.component';
+import { ContactComponent } from './components/contact/contact.component';
+import { AfspraakComponent } from './afspraak/afspraak.component';
+import { PortfolioComponent } from './portfolio/portfolio.component';
+import { BeheerComponent } from './beheer/beheer.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' }, //default route
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
-  { path: 'bleken', component: BlekenComponent },
-  { path: 'slijtage', component: SlijtageBehandelingComponent },
-  { path: 'kroon-brugwerk', component: KroonBrugwerkComponent },
-  { path: 'facings', component: FacingsComponent },
   { path: 'contact', component: ContactComponent },
   { path: 'afspraak', component: AfspraakComponent },
+  { path: 'portfolio', component: PortfolioComponent },
+  { path: 'beheer', component: BeheerComponent },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {
+    anchorScrolling: 'disabled',        // Wordt afgehandeld door HomeComponent
+    scrollPositionRestoration: 'disabled', // Wordt afgehandeld door AppComponent
+    scrollOffset: [0, 80]
+  })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

@@ -1,0 +1,210 @@
+<section id="afspraak" class="afspraak-section">
+  <div class="container">
+
+    <div class="section-title">
+      <span class="overline">Direct regelen</span>
+      <h2>Afspraak aanvragen</h2>
+      <p>Vul het formulier in en ik neem zo snel mogelijk contact met u op om een afspraak in te plannen.</p>
+    </div>
+
+    <div class="row g-4 align-items-start">
+
+      <!-- Formulier -->
+      <div class="col-lg-7">
+        <div class="afspraak-card">
+
+          <div *ngIf="!verzonden">
+            <form [formGroup]="afspraakForm" (ngSubmit)="onSubmit()" novalidate>
+
+              <!-- Naam -->
+              <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                  <label class="form-label" for="voornaam">Voornaam <span class="text-danger">*</span></label>
+                  <input
+                    id="voornaam"
+                    type="text"
+                    class="form-control"
+                    formControlName="voornaam"
+                    placeholder="Voornaam"
+                    [class.is-invalid]="f['voornaam'].invalid && f['voornaam'].touched">
+                  <div class="invalid-feedback">Vul uw voornaam in.</div>
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label" for="achternaam">Achternaam <span class="text-danger">*</span></label>
+                  <input
+                    id="achternaam"
+                    type="text"
+                    class="form-control"
+                    formControlName="achternaam"
+                    placeholder="Achternaam"
+                    [class.is-invalid]="f['achternaam'].invalid && f['achternaam'].touched">
+                  <div class="invalid-feedback">Vul uw achternaam in.</div>
+                </div>
+              </div>
+
+              <!-- Contactgegevens -->
+              <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                  <label class="form-label" for="email">E-mailadres <span class="text-danger">*</span></label>
+                  <input
+                    id="email"
+                    type="email"
+                    class="form-control"
+                    formControlName="email"
+                    placeholder="naam@email.nl"
+                    [class.is-invalid]="f['email'].invalid && f['email'].touched">
+                  <div class="invalid-feedback">Vul een geldig e-mailadres in.</div>
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label" for="telefoon">Telefoonnummer <span class="text-danger">*</span></label>
+                  <input
+                    id="telefoon"
+                    type="tel"
+                    class="form-control"
+                    formControlName="telefoon"
+                    placeholder="06 12345678"
+                    [class.is-invalid]="f['telefoon'].invalid && f['telefoon'].touched">
+                  <div class="invalid-feedback">Vul een geldig telefoonnummer in.</div>
+                </div>
+              </div>
+
+              <!-- Behandeling & Datum -->
+              <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                  <label class="form-label" for="behandeling">Behandeling <span class="text-danger">*</span></label>
+                  <select
+                    id="behandeling"
+                    class="form-select"
+                    formControlName="behandeling"
+                    [class.is-invalid]="f['behandeling'].invalid && f['behandeling'].touched">
+                    <option value="" disabled selected>Kies een behandeling</option>
+                    <option *ngFor="let b of behandelingen" [value]="b">{{ b }}</option>
+                  </select>
+                  <div class="invalid-feedback">Selecteer een behandeling.</div>
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label" for="datum">Voorkeursdatum</label>
+                  <input
+                    id="datum"
+                    type="date"
+                    class="form-control"
+                    formControlName="datum"
+                    [min]="today">
+                </div>
+              </div>
+
+              <!-- Bericht -->
+              <div class="mb-3">
+                <label class="form-label" for="bericht">Bericht / Toelichting</label>
+                <textarea
+                  id="bericht"
+                  class="form-control"
+                  formControlName="bericht"
+                  rows="4"
+                  placeholder="Heeft u nog aanvullende informatie of vragen? Laat het hier weten.">
+                </textarea>
+              </div>
+
+              <!-- Privacy -->
+              <div class="mb-4">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="privacy"
+                    formControlName="privacy"
+                    [class.is-invalid]="f['privacy'].invalid && f['privacy'].touched">
+                  <label class="form-check-label" for="privacy" style="font-size: 13px; color: var(--clr-text-muted);">
+                    Ik ga akkoord met het verwerken van mijn gegevens voor het inplannen van een afspraak. <span class="text-danger">*</span>
+                  </label>
+                  <div class="invalid-feedback">U moet akkoord gaan om door te gaan.</div>
+                </div>
+              </div>
+
+              <!-- Foutmelding -->
+              <div *ngIf="verzendFout" class="alert alert-danger mt-2" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Er is iets misgegaan bij het versturen. Probeer het opnieuw of bel ons op <a href="tel:0596219219">0596 219 219</a>.
+              </div>
+
+              <!-- Submit -->
+              <button type="submit" class="btn-submit" [disabled]="afspraakForm.invalid || isVerzenden">
+                <span *ngIf="!isVerzenden">
+                  <i class="bi bi-send"></i>
+                  Aanvraag versturen
+                </span>
+                <span *ngIf="isVerzenden">
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Versturen…
+                </span>
+              </button>
+
+            </form>
+          </div>
+
+          <!-- Succes melding -->
+          <div *ngIf="verzonden" class="succes-melding">
+            <div class="succes-icoon">
+              <i class="bi bi-check-lg"></i>
+            </div>
+            <h3>Aanvraag verstuurd!</h3>
+            <p>
+              Bedankt voor uw aanvraag. Ik neem zo snel mogelijk contact met u op om een afspraak in te plannen.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Contact info sidebar -->
+      <div class="col-lg-5">
+        <div class="afspraak-info">
+          <h4><i class="bi bi-info-circle me-2" style="color: var(--clr-primary);"></i>Handige informatie</h4>
+
+          <div class="contact-item">
+            <div class="ci-icon"><i class="bi bi-geo-alt"></i></div>
+            <div class="ci-text">
+              <strong>Locatie</strong>
+              <span>Spoorbaan 1, 9901 DD Appingedam</span>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="ci-icon"><i class="bi bi-telephone"></i></div>
+            <div class="ci-text">
+              <strong>Telefoon</strong>
+              <span><a href="tel:0596219219">0596 219 219</a></span>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="ci-icon"><i class="bi bi-clock"></i></div>
+            <div class="ci-text">
+              <strong>Openingstijden</strong>
+              <span>
+                Maandag: 08:00 – 21:00<br>
+                Di t/m vr: 08:00 – 17:00
+              </span>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="ci-icon"><i class="bi bi-reply"></i></div>
+            <div class="ci-text">
+              <strong>Reactietijd</strong>
+              <span>Binnen 1–2 werkdagen</span>
+            </div>
+          </div>
+
+          <hr style="border-color: var(--clr-primary-light); margin: 24px 0;">
+
+          <p style="font-size: 13px; color: var(--clr-text-muted); margin: 0;">
+            <i class="bi bi-shield-check me-1" style="color: var(--clr-primary);"></i>
+            Uw gegevens worden vertrouwelijk behandeld en uitsluitend gebruikt voor het inplannen van uw afspraak.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

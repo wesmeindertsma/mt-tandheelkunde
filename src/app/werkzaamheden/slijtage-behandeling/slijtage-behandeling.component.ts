@@ -3,6 +3,7 @@ import {Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 
 @Component({
+  standalone: false,
   selector: 'app-slijtage-behandeling',
   templateUrl: './slijtage-behandeling.component.html',
   styleUrl: './slijtage-behandeling.component.css'

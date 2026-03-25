@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,10 +16,12 @@ import { KroonBrugwerkComponent } from './werkzaamheden/kroon-brugwerk/kroon-bru
 import { HeaderComponent } from './components/header/header.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { ContactComponent } from './components/contact/contact.component';
-import {InMemoryWebApiModule} from "angular-in-memory-web-api";
-import {InMemoryDataService} from "./in-memory-data.service";
-import {provideHttpClient, withInterceptorsFromDi} from "@angular/common/http";
-import {TruncatePipe} from "./werkzaamheden/truncate.pipe";
+import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
+import { InMemoryDataService } from './in-memory-data.service';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { TruncatePipe } from './werkzaamheden/truncate.pipe';
+import { PortfolioComponent } from './portfolio/portfolio.component';
+import { BeheerComponent } from './beheer/beheer.component';
 
 @NgModule({
   declarations: [
@@ -37,10 +39,13 @@ import {TruncatePipe} from "./werkzaamheden/truncate.pipe";
     ContactComponent,
     AfspraakComponent,
     TruncatePipe,
+    PortfolioComponent,
+    BeheerComponent,
   ],
   imports: [
     BrowserModule,
     ReactiveFormsModule,
+    FormsModule,
     InMemoryWebApiModule.forRoot(InMemoryDataService),
     AppRoutingModule
   ],

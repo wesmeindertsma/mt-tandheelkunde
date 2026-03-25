@@ -1,0 +1,466 @@
+/* ─── Login ─────────────────────────────────── */
+.beheer-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f4f5;
+  padding: 24px;
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  text-align: center;
+}
+
+.login-logo {
+  font-family: var(--font-heading, 'Poppins', sans-serif);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--clr-primary, #2a8c9a);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.login-card h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.login-sub {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 28px;
+}
+
+.google-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
+/* ─── Panel ─────────────────────────────────── */
+.beheer-panel {
+  min-height: 100vh;
+  background: #f5f7f8;
+  display: flex;
+  flex-direction: column;
+}
+
+.beheer-header {
+  background: #1a2e35;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+.beheer-title {
+  font-family: var(--font-heading, 'Poppins', sans-serif);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.btn-uitloggen {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.4);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-uitloggen:hover { background: rgba(255,255,255,0.12); }
+
+/* ─── Tabs ──────────────────────────────────── */
+.beheer-tabs {
+  background: #fff;
+  border-bottom: 2px solid #e8edf0;
+  display: flex;
+  padding: 0 24px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 14px 20px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #6c757d;
+  cursor: pointer;
+  margin-bottom: -2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.tab-btn:hover { color: var(--clr-primary, #2a8c9a); }
+.tab-btn.active {
+  color: var(--clr-primary, #2a8c9a);
+  border-bottom-color: var(--clr-primary, #2a8c9a);
+  font-weight: 600;
+}
+
+/* ─── Content ───────────────────────────────── */
+.beheer-content {
+  flex: 1;
+  padding: 28px 24px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.tab-intro {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  color: #495057;
+}
+.tab-intro p { margin: 0 0 6px; }
+.tab-intro p:last-child { margin: 0; }
+
+/* ─── Case card ─────────────────────────────── */
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--clr-primary, #2a8c9a);
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: background 0.2s;
+}
+.btn-add:hover { background: #226e7a; }
+
+.case-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.case-header { margin-bottom: 16px; }
+
+.case-naam-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.case-naam-input {
+  flex: 1;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font-heading, 'Poppins', sans-serif);
+  color: #1a2e35;
+}
+.case-naam-input:focus { outline: none; border-color: var(--clr-primary, #2a8c9a); box-shadow: 0 0 0 2px rgba(42,140,154,0.15); }
+
+.case-actions { display: flex; gap: 6px; }
+
+/* ─── Foto rij ──────────────────────────────── */
+.foto-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+
+.foto-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafb;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.foto-preview-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #e9ecef;
+}
+
+.foto-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.foto-preview-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #adb5bd;
+  font-size: 1.5rem;
+  background: #e9ecef;
+  border-radius: 6px;
+}
+
+.foto-upload-btn {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: 6px;
+}
+.foto-preview-wrap:hover .foto-upload-btn { opacity: 1; }
+
+.foto-meta { flex: 1; }
+
+.foto-acties { display: flex; flex-direction: column; gap: 4px; }
+
+.btn-add-foto {
+  background: transparent;
+  border: 1px dashed #adb5bd;
+  color: #6c757d;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-add-foto:hover { border-color: var(--clr-primary, #2a8c9a); color: var(--clr-primary, #2a8c9a); }
+
+/* ─── Behandelingen ─────────────────────────── */
+.behandeling-card-admin {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.beh-foto-col {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #e9ecef;
+}
+
+.beh-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.beh-meta-col { flex: 1; }
+.beh-acties-col { flex-shrink: 0; }
+
+.form-label-sm {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* ─── Gedeelde knoppen ──────────────────────── */
+.btn-icon {
+  background: transparent;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  padding: 5px 8px;
+  cursor: pointer;
+  color: #6c757d;
+  font-size: 0.85rem;
+  transition: background 0.15s, color 0.15s;
+  display: inline-flex;
+  align-items: center;
+}
+.btn-icon:hover:not(:disabled) { background: #f0f4f5; color: #1a2e35; }
+.btn-icon.danger:hover:not(:disabled) { background: #fff0f0; color: #dc3545; border-color: #dc3545; }
+.btn-icon:disabled { opacity: 0.3; cursor: default; }
+.btn-icon.thumbnail-active { color: #f0a500; border-color: #f0a500; background: #fffbf0; }
+
+/* ─── Instellingen ──────────────────────────── */
+.instellingen-tab { max-width: 560px; }
+
+.instelling-blok {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.instelling-blok h4 { font-weight: 600; font-size: 1.05rem; margin-bottom: 4px; }
+
+.danger-zone { border-left: 4px solid #dc3545; }
+
+.account-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #f5f7f8;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+.account-info i { font-size: 2rem; color: var(--clr-primary, #2a8c9a); }
+.account-info strong { display: block; color: #1a2e35; }
+.account-info span { color: #6c757d; font-size: 0.82rem; }
+
+.btn-danger-outline {
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-danger-outline:hover { background: #fff5f5; }
+
+.btn-danger {
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid #dee2e6;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.reset-confirm { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+
+/* ─── Footer ────────────────────────────────── */
+.beheer-footer {
+  background: #fff;
+  border-top: 1px solid #e8edf0;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  position: sticky;
+  bottom: 0;
+}
+
+.opslaan-melding {
+  color: #2e7d52;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.btn-opslaan {
+  background: var(--clr-primary, #2a8c9a);
+  color: #fff;
+  border: none;
+  padding: 11px 28px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+}
+.btn-opslaan:hover { background: #226e7a; }
+
+/* ─── Delen ─────────────────────────────────── */
+.delen-toggle-row { margin-top: 12px; }
+
+.btn-delen {
+  background: transparent;
+  border: 1px solid #dee2e6;
+  color: #6c757d;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-delen:hover { border-color: var(--clr-primary, #2a8c9a); color: var(--clr-primary, #2a8c9a); }
+
+.delen-panel {
+  margin-top: 12px;
+  padding: 16px;
+  background: #f8fafb;
+  border-radius: 8px;
+  border: 1px solid #e8edf0;
+}
+
+.delen-textarea {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  resize: vertical;
+}
+
+.delen-knoppen { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+
+.btn-platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: #fff;
+  transition: opacity 0.2s;
+}
+.btn-platform:hover { opacity: 0.85; }
+.btn-platform.facebook  { background: #1877f2; }
+.btn-platform.linkedin  { background: #0a66c2; }
+.btn-platform.instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+
+.kopie-ok {
+  font-size: 0.78rem;
+  background: rgba(255,255,255,0.25);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.delen-instagram-hint { margin: 0; font-size: 0.8rem; }

@@ -1,0 +1,75 @@
+<section id="portfolio" class="portfolio-section">
+  <div class="container">
+
+    <div class="section-title">
+      <span class="overline">Resultaten</span>
+      <h2>Portfolio</h2>
+      <p>Een selectie van behandelingen en resultaten. Klik op een foto voor meer.</p>
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+      <div class="col" *ngFor="let c of cases">
+        <div class="portfolio-item" (click)="openCarousel(c.id, thumbnail(c).id)" *ngIf="c.fotos.length > 0">
+          <img [src]="thumbnail(c).src" [alt]="c.behandeling" class="portfolio-img">
+          <!-- Altijd-zichtbare titel -->
+          <div class="portfolio-titel">
+            <span>{{ c.behandeling }}</span>
+            <span *ngIf="c.fotos.length > 1" class="portfolio-titel-count">
+              <i class="bi bi-images"></i> {{ c.fotos.length }}
+            </span>
+          </div>
+          <!-- Hover overlay -->
+          <div class="portfolio-overlay">
+            <i class="bi bi-zoom-in portfolio-zoom"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Carousel overlay -->
+<div class="carousel-overlay" *ngIf="activeCaseId" (click)="sluit()">
+  <div class="carousel-modal" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="carousel-header">
+      <span class="carousel-behandeling">{{ activeCase!.behandeling }}</span>
+      <button class="carousel-sluit" (click)="sluit()" aria-label="Sluiten">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Foto met prev/next -->
+    <div class="carousel-foto-area">
+      <button class="carousel-nav" (click)="vorige()" [disabled]="activeFotoIndex === 0" aria-label="Vorige">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+
+      <div class="carousel-foto-wrapper">
+        <img *ngIf="activeFoto" [src]="activeFoto!.src" [alt]="activeCase!.behandeling" class="carousel-foto">
+      </div>
+
+      <button class="carousel-nav" (click)="volgende()" [disabled]="activeFotoIndex >= activeCase!.fotos.length - 1" aria-label="Volgende">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Caption + counter -->
+    <div class="carousel-footer">
+      <p *ngIf="activeFoto!.caption" class="carousel-caption">{{ activeFoto!.caption }}</p>
+      <span class="carousel-counter">{{ activeFotoIndex + 1 }} / {{ activeCase!.fotos.length }}</span>
+      <div class="carousel-dots" *ngIf="activeCase!.fotos.length > 1">
+        <button
+          *ngFor="let f of activeCase!.fotos; let i = index"
+          class="dot"
+          [class.active]="i === activeFotoIndex"
+          (click)="activeFotoIndex = i"
+          [attr.aria-label]="'Foto ' + (i + 1)">
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

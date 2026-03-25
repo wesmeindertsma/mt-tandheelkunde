@@ -1,6 +1,7 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-kroon-brugwerk',
   templateUrl: './kroon-brugwerk.component.html',
   styleUrl: './kroon-brugwerk.component.css'

@@ -1,6 +1,7 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-facings',
   templateUrl: './facings.component.html',
   styleUrl: './facings.component.css'
