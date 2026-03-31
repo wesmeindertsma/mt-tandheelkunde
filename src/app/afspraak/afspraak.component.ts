@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import emailjs from '@emailjs/browser';
 
 const EMAILJS_PUBLIC_KEY  = 'lPe4mE37SaC3xMFnn';
-const EMAILJS_SERVICE_ID  = 'service_tl69oe9';
+const EMAILJS_SERVICE_ID  = 'service_te9eflm';
 const EMAILJS_TEMPLATE_ID = 'template_ylska8w';
 
 @Component({
