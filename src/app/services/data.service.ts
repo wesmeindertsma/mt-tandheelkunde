@@ -1,23 +1,25 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { Firestore, doc, setDoc, onSnapshot } from '@angular/fire/firestore';
+import { Storage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 
 export interface PortfolioFotoItem {
   id: string;
-  src: string;      // relatief pad ('assets/...') of base64 data URL
+  src: string;      // Firebase Storage URL of relatief pad voor standaardfotos
   caption: string;
 }
 
 export interface PortfolioCase {
   id: string;
   behandeling: string;
-  thumbnailId?: string;   // welke foto als grid-thumbnail; valt terug op eerste foto
+  thumbnailId?: string;
   fotos: PortfolioFotoItem[];
 }
 
 export interface BehandelingCard {
   id: string;
   titel: string;
-  foto: string;     // relatief pad of base64 data URL
+  foto: string;
   beschrijving: string;
   detailTekst?: string;
 }
@@ -125,117 +127,126 @@ const STANDAARD_TEKSTEN: TekstenData = {
   openingstijdDiVr: 'Di t/m vrijdag: 08:00 – 17:00 uur',
 };
 
+// localStorage-sleutels als snelle cache voor eerste render
+const LS_PORTFOLIO    = 'mt_portfolio_v1';
+const LS_BEHANDELINGEN = 'mt_behandelingen_v1';
+const LS_TEKSTEN      = 'mt_teksten_v1';
+const LS_WACHTWOORD   = 'mt_beheer_pwd';
+
+function getCached<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(fallback));
+  } catch {
+    return JSON.parse(JSON.stringify(fallback));
+  }
+}
+
 @Injectable({ providedIn: 'root' })
-export class DataService {
-  private readonly LS_PORTFOLIO    = 'mt_portfolio_v1';
-  private readonly LS_BEHANDELINGEN = 'mt_behandelingen_v1';
-  private readonly LS_WACHTWOORD   = 'mt_beheer_pwd';
-  private readonly LS_TEKSTEN      = 'mt_teksten_v1';
+export class DataService implements OnDestroy {
 
-  private _portfolio$!: BehaviorSubject<PortfolioCase[]>;
-  portfolio$!: Observable<PortfolioCase[]>;
+  private _portfolio$     = new BehaviorSubject<PortfolioCase[]>(getCached(LS_PORTFOLIO, STANDAARD_PORTFOLIO));
+  portfolio$: Observable<PortfolioCase[]> = this._portfolio$.asObservable();
 
-  private _behandelingen$!: BehaviorSubject<BehandelingCard[]>;
-  behandelingen$!: Observable<BehandelingCard[]>;
+  private _behandelingen$ = new BehaviorSubject<BehandelingCard[]>(getCached(LS_BEHANDELINGEN, STANDAARD_BEHANDELINGEN));
+  behandelingen$: Observable<BehandelingCard[]> = this._behandelingen$.asObservable();
 
-  private _teksten$!: BehaviorSubject<TekstenData>;
-  teksten$!: Observable<TekstenData>;
+  private _teksten$       = new BehaviorSubject<TekstenData>(getCached(LS_TEKSTEN, STANDAARD_TEKSTEN));
+  teksten$: Observable<TekstenData> = this._teksten$.asObservable();
 
-  constructor() {
-    this._portfolio$     = new BehaviorSubject<PortfolioCase[]>(this.getPortfolioRaw());
-    this.portfolio$      = this._portfolio$.asObservable();
-    this._behandelingen$ = new BehaviorSubject<BehandelingCard[]>(this.getBehandelingenRaw());
-    this.behandelingen$  = this._behandelingen$.asObservable();
-    this._teksten$       = new BehaviorSubject<TekstenData>(this.getTekstenRaw());
-    this.teksten$        = this._teksten$.asObservable();
+  private unsubFirestore: (() => void) | undefined;
+
+  constructor(private firestore: Firestore, private storage: Storage) {
+    // Real-time listener: zodra Firestore data binnenkomt, update alles
+    this.unsubFirestore = onSnapshot(doc(this.firestore, 'site/data'), snap => {
+      const d = snap.data();
+      if (!d) return;
+      if (Array.isArray(d['portfolio'])) {
+        localStorage.setItem(LS_PORTFOLIO, JSON.stringify(d['portfolio']));
+        this._portfolio$.next(d['portfolio']);
+      }
+      if (Array.isArray(d['behandelingen'])) {
+        localStorage.setItem(LS_BEHANDELINGEN, JSON.stringify(d['behandelingen']));
+        this._behandelingen$.next(d['behandelingen']);
+      }
+      if (d['teksten']) {
+        localStorage.setItem(LS_TEKSTEN, JSON.stringify(d['teksten']));
+        this._teksten$.next(d['teksten']);
+      }
+    });
   }
 
-  // ─── Portfolio ─────────────────────────────────────────
-
-  private getPortfolioRaw(): PortfolioCase[] {
-    try {
-      const raw = localStorage.getItem(this.LS_PORTFOLIO);
-      return raw ? JSON.parse(raw) : this.kloon(STANDAARD_PORTFOLIO);
-    } catch {
-      return this.kloon(STANDAARD_PORTFOLIO);
-    }
+  ngOnDestroy(): void {
+    this.unsubFirestore?.();
   }
 
-  getPortfolio(): PortfolioCase[] { return this.getPortfolioRaw(); }
+  // ─── Synchrone snapshots (voor beheer-initialisatie) ───
 
-  savePortfolio(cases: PortfolioCase[]): void {
-    localStorage.setItem(this.LS_PORTFOLIO, JSON.stringify(cases));
-    this._portfolio$.next(this.kloon(cases));
+  getPortfolio(): PortfolioCase[]     { return this._portfolio$.value; }
+  getBehandelingen(): BehandelingCard[] { return this._behandelingen$.value; }
+  getTeksten(): TekstenData           { return this._teksten$.value; }
+
+  // ─── Opslaan naar Firestore ────────────────────────────
+  // Bestaande base64-afbeeldingen worden automatisch naar
+  // Firebase Storage gemigreerd voor ze in Firestore belanden.
+
+  async savePortfolio(cases: PortfolioCase[]): Promise<void> {
+    const migrated = await this.migratePortfolioImages(cases);
+    await setDoc(doc(this.firestore, 'site/data'), { portfolio: migrated }, { merge: true });
   }
 
-  // ─── Behandelingen ─────────────────────────────────────
-
-  private getBehandelingenRaw(): BehandelingCard[] {
-    try {
-      const raw = localStorage.getItem(this.LS_BEHANDELINGEN);
-      return raw ? JSON.parse(raw) : this.kloon(STANDAARD_BEHANDELINGEN);
-    } catch {
-      return this.kloon(STANDAARD_BEHANDELINGEN);
-    }
+  async saveBehandelingen(behandelingen: BehandelingCard[]): Promise<void> {
+    const migrated = await this.migrateBehandelingenImages(behandelingen);
+    await setDoc(doc(this.firestore, 'site/data'), { behandelingen: migrated }, { merge: true });
   }
 
-  getBehandelingen(): BehandelingCard[] { return this.getBehandelingenRaw(); }
-
-  saveBehandelingen(behandelingen: BehandelingCard[]): void {
-    localStorage.setItem(this.LS_BEHANDELINGEN, JSON.stringify(behandelingen));
-    this._behandelingen$.next(this.kloon(behandelingen));
+  async saveTeksten(teksten: TekstenData): Promise<void> {
+    await setDoc(doc(this.firestore, 'site/data'), { teksten }, { merge: true });
   }
 
-  // ─── Teksten ───────────────────────────────────────────
+  // ─── Foto uploaden naar Firebase Storage ───────────────
 
-  private getTekstenRaw(): TekstenData {
-    try {
-      const raw = localStorage.getItem(this.LS_TEKSTEN);
-      return raw ? JSON.parse(raw) : this.kloon(STANDAARD_TEKSTEN);
-    } catch {
-      return this.kloon(STANDAARD_TEKSTEN);
-    }
+  async uploadImage(file: File, storagePath: string): Promise<string> {
+    const blob = await this.compressToBlob(file);
+    const storageRef = ref(this.storage, storagePath);
+    await uploadBytes(storageRef, blob);
+    return getDownloadURL(storageRef);
   }
 
-  getTeksten(): TekstenData { return this.getTekstenRaw(); }
+  // ─── Reset naar standaarddata ──────────────────────────
 
-  saveTeksten(teksten: TekstenData): void {
-    localStorage.setItem(this.LS_TEKSTEN, JSON.stringify(teksten));
-    this._teksten$.next(this.kloon(teksten));
+  async reset(): Promise<void> {
+    const data = {
+      portfolio:     JSON.parse(JSON.stringify(STANDAARD_PORTFOLIO)),
+      behandelingen: JSON.parse(JSON.stringify(STANDAARD_BEHANDELINGEN)),
+      teksten:       JSON.parse(JSON.stringify(STANDAARD_TEKSTEN)),
+    };
+    await setDoc(doc(this.firestore, 'site/data'), data);
+    // Firestore-listener pikt dit op en updatet de subjects automatisch
   }
 
-  // ─── Wachtwoord ────────────────────────────────────────
+  // ─── Wachtwoord (blijft lokaal) ────────────────────────
 
   getWachtwoord(): string {
-    return localStorage.getItem(this.LS_WACHTWOORD) ?? 'tandarts';
+    return localStorage.getItem(LS_WACHTWOORD) ?? 'tandarts';
   }
 
   saveWachtwoord(pwd: string): void {
-    if (pwd.trim()) localStorage.setItem(this.LS_WACHTWOORD, pwd.trim());
+    if (pwd.trim()) localStorage.setItem(LS_WACHTWOORD, pwd.trim());
   }
 
-  // ─── Reset ─────────────────────────────────────────────
-
-  reset(): void {
-    localStorage.removeItem(this.LS_PORTFOLIO);
-    localStorage.removeItem(this.LS_BEHANDELINGEN);
-    localStorage.removeItem(this.LS_TEKSTEN);
-    this._portfolio$.next(this.getPortfolioRaw());
-    this._behandelingen$.next(this.getBehandelingenRaw());
-    this._teksten$.next(this.getTekstenRaw());
-  }
-
-  // ─── Hulp ──────────────────────────────────────────────
+  // ─── Hulpmethodes ──────────────────────────────────────
 
   nieuwId(): string {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   }
 
+  /** Comprimeer File naar base64 (voor directe preview in beheer) */
   async compressImage(file: File, maxWidth = 1400): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = (e) => {
+      reader.onload = e => {
         const img = new Image();
         img.src = e.target!.result as string;
         img.onload = () => {
@@ -252,7 +263,66 @@ export class DataService {
     });
   }
 
-  private kloon<T>(obj: T): T {
-    return JSON.parse(JSON.stringify(obj));
+  /** Comprimeer File naar Blob (voor Storage-upload) */
+  private compressToBlob(file: File, maxWidth = 1400): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = e => {
+        const img = new Image();
+        img.src = e.target!.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let w = img.width, h = img.height;
+          if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+          canvas.toBlob(
+            blob => blob ? resolve(blob) : reject(new Error('Canvas toBlob mislukt')),
+            'image/jpeg', 0.82
+          );
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  }
+
+  /** Converteer base64 data-URL naar Blob */
+  private base64ToBlob(dataUrl: string): Blob {
+    const [header, base64] = dataUrl.split(',');
+    const mime = header.match(/:(.*?);/)?.[1] ?? 'image/jpeg';
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return new Blob([bytes], { type: mime });
+  }
+
+  /** Upload base64-afbeeldingen in portfolio naar Storage */
+  private async migratePortfolioImages(cases: PortfolioCase[]): Promise<PortfolioCase[]> {
+    const result: PortfolioCase[] = JSON.parse(JSON.stringify(cases));
+    for (const c of result) {
+      for (const f of c.fotos) {
+        if (f.src.startsWith('data:')) {
+          const storageRef = ref(this.storage, `portfolio/${c.id}/${f.id}`);
+          await uploadBytes(storageRef, this.base64ToBlob(f.src));
+          f.src = await getDownloadURL(storageRef);
+        }
+      }
+    }
+    return result;
+  }
+
+  /** Upload base64-afbeeldingen in behandelingen naar Storage */
+  private async migrateBehandelingenImages(behandelingen: BehandelingCard[]): Promise<BehandelingCard[]> {
+    const result: BehandelingCard[] = JSON.parse(JSON.stringify(behandelingen));
+    for (const b of result) {
+      if (b.foto.startsWith('data:')) {
+        const storageRef = ref(this.storage, `behandelingen/${b.id}`);
+        await uploadBytes(storageRef, this.base64ToBlob(b.foto));
+        b.foto = await getDownloadURL(storageRef);
+      }
+    }
+    return result;
   }
 }

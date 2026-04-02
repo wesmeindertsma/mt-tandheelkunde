@@ -19,6 +19,7 @@ export class BeheerComponent implements OnInit, AfterViewInit {
   teksten!: TekstenData;
 
   opslaanMelding = '';
+  opslaanBusy = false;
   resetBevestiging = false;
 
   delenOpen: Record<string, boolean> = {};
@@ -95,17 +96,26 @@ export class BeheerComponent implements OnInit, AfterViewInit {
   }
 
   private laadData(): void {
-    this.portfolioCases = this.dataService.getPortfolio();
-    this.behandelingen  = this.dataService.getBehandelingen();
-    this.teksten        = this.dataService.getTeksten();
+    this.portfolioCases = JSON.parse(JSON.stringify(this.dataService.getPortfolio()));
+    this.behandelingen  = JSON.parse(JSON.stringify(this.dataService.getBehandelingen()));
+    this.teksten        = JSON.parse(JSON.stringify(this.dataService.getTeksten()));
   }
 
-  opslaan(): void {
-    this.dataService.savePortfolio(this.portfolioCases);
-    this.dataService.saveBehandelingen(this.behandelingen);
-    this.dataService.saveTeksten(this.teksten);
-    this.opslaanMelding = 'Wijzigingen opgeslagen!';
-    setTimeout(() => (this.opslaanMelding = ''), 3000);
+  async opslaan(): Promise<void> {
+    this.opslaanBusy = true;
+    try {
+      await Promise.all([
+        this.dataService.savePortfolio(this.portfolioCases),
+        this.dataService.saveBehandelingen(this.behandelingen),
+        this.dataService.saveTeksten(this.teksten),
+      ]);
+      this.opslaanMelding = 'Wijzigingen opgeslagen!';
+    } catch {
+      this.opslaanMelding = 'Fout bij opslaan, probeer opnieuw.';
+    } finally {
+      this.opslaanBusy = false;
+      setTimeout(() => (this.opslaanMelding = ''), 3000);
+    }
   }
 
   // ─── Portfolio: cases ──────────────────────────────────
@@ -147,9 +157,12 @@ export class BeheerComponent implements OnInit, AfterViewInit {
   async uploadPortfolioFoto(caseIndex: number, fotoIndex: number, event: Event): Promise<void> {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
+    const c = this.portfolioCases[caseIndex];
+    const f = c.fotos[fotoIndex];
     try {
-      this.portfolioCases[caseIndex].fotos[fotoIndex].src = await this.dataService.compressImage(file);
-    } catch { alert('Fout bij laden van afbeelding.'); }
+      f.src = await this.dataService.compressImage(file); // directe preview
+      f.src = await this.dataService.uploadImage(file, `portfolio/${c.id}/${f.id}`);
+    } catch { alert('Fout bij uploaden van afbeelding.'); }
   }
 
   // ─── Behandelingen ─────────────────────────────────────
@@ -163,17 +176,19 @@ export class BeheerComponent implements OnInit, AfterViewInit {
   async uploadBehandelingFoto(index: number, event: Event): Promise<void> {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
+    const b = this.behandelingen[index];
     try {
-      this.behandelingen[index].foto = await this.dataService.compressImage(file);
-    } catch { alert('Fout bij laden van afbeelding.'); }
+      b.foto = await this.dataService.compressImage(file); // directe preview
+      b.foto = await this.dataService.uploadImage(file, `behandelingen/${b.id}`);
+    } catch { alert('Fout bij uploaden van afbeelding.'); }
   }
 
   // ─── Instellingen ──────────────────────────────────────
 
   resetBevestigen(): void  { this.resetBevestiging = true; }
 
-  resetUitvoeren(): void {
-    this.dataService.reset();
+  async resetUitvoeren(): Promise<void> {
+    await this.dataService.reset();
     this.laadData();
     this.resetBevestiging = false;
   }

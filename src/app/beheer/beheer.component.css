@@ -336,6 +336,18 @@
 .account-info strong { display: block; color: #1a2e35; }
 .account-info span { color: #6c757d; font-size: 0.82rem; }
 
+.btn-primary-outline {
+  border: 1px solid var(--clr-primary, #2a8c9a);
+  color: var(--clr-primary, #2a8c9a);
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-primary-outline:hover { background: #eef8f9; }
+
 .btn-danger-outline {
   border: 1px solid #dc3545;
   color: #dc3545;

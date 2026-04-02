@@ -309,8 +309,9 @@
     <div class="opslaan-melding" *ngIf="opslaanMelding">
       <i class="bi bi-check-circle me-2"></i>{{ opslaanMelding }}
     </div>
-    <button class="btn-opslaan" (click)="opslaan()">
-      <i class="bi bi-floppy me-2"></i>Opslaan
+    <button class="btn-opslaan" (click)="opslaan()" [disabled]="opslaanBusy">
+      <i class="bi me-2" [class.bi-floppy]="!opslaanBusy" [class.bi-hourglass-split]="opslaanBusy"></i>
+      {{ opslaanBusy ? 'Bezig...' : 'Opslaan' }}
     </button>
   </div>
 
