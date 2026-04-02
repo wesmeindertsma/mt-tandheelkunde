@@ -30,6 +30,9 @@
     <button class="tab-btn" [class.active]="actieveTab === 'behandelingen'" (click)="actieveTab = 'behandelingen'">
       <i class="bi bi-card-list me-1"></i>Behandelingen
     </button>
+    <button class="tab-btn" [class.active]="actieveTab === 'teksten'" (click)="actieveTab = 'teksten'">
+      <i class="bi bi-text-paragraph me-1"></i>Teksten
+    </button>
     <button class="tab-btn" [class.active]="actieveTab === 'instellingen'" (click)="actieveTab = 'instellingen'">
       <i class="bi bi-gear me-1"></i>Instellingen
     </button>
@@ -198,14 +201,24 @@
               (input)="b.titel = $any($event.target).value"
               placeholder="Titel behandeling">
           </div>
-          <div>
-            <label class="form-label-sm">Beschrijving</label>
+          <div class="mb-2">
+            <label class="form-label-sm">Korte beschrijving (op de kaart)</label>
             <textarea
               class="form-control"
-              rows="3"
+              rows="2"
               [value]="b.beschrijving"
               (input)="b.beschrijving = $any($event.target).value"
               placeholder="Korte beschrijving van de behandeling">
+            </textarea>
+          </div>
+          <div>
+            <label class="form-label-sm">Uitgebreide tekst (in de popup)</label>
+            <textarea
+              class="form-control"
+              rows="6"
+              [value]="b.detailTekst ?? ''"
+              (input)="b.detailTekst = $any($event.target).value"
+              placeholder="Uitgebreide uitleg, werkwijze, kosten… (lege regels worden als alinea-scheiding gebruikt)">
             </textarea>
           </div>
         </div>
@@ -217,6 +230,38 @@
         </div>
 
       </div>
+    </div>
+
+    <!-- ─── Tab: Teksten ───────────────────────────────── -->
+    <div *ngIf="actieveTab === 'teksten'">
+
+      <div class="tab-intro">
+        <p>Pas de teksten op de homepagina aan. Klik op "Opslaan" onderaan om wijzigingen door te voeren.</p>
+      </div>
+
+      <div class="tekst-blok" *ngIf="teksten">
+        <div class="mb-3">
+          <label class="form-label-sm">Hero ondertitel</label>
+          <textarea class="form-control" rows="2" [(ngModel)]="teksten.heroTagline" placeholder="Ondertitel in de hero-banner"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label-sm">Wie ben ik – alinea 1</label>
+          <textarea class="form-control" rows="4" [(ngModel)]="teksten.wieIkBenPar1"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label-sm">Wie ben ik – alinea 2</label>
+          <textarea class="form-control" rows="4" [(ngModel)]="teksten.wieIkBenPar2"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label-sm">Openingstijden maandag</label>
+          <input class="form-control" type="text" [(ngModel)]="teksten.openingstijdMa" placeholder="bijv. Maandag: 08:00 – 21:00 uur">
+        </div>
+        <div class="mb-3">
+          <label class="form-label-sm">Openingstijden di t/m vrijdag</label>
+          <input class="form-control" type="text" [(ngModel)]="teksten.openingstijdDiVr" placeholder="bijv. Di t/m vrijdag: 08:00 – 17:00 uur">
+        </div>
+      </div>
+
     </div>
 
     <!-- ─── Tab: Instellingen ──────────────────────────── -->

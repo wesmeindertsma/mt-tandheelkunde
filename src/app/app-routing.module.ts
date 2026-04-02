@@ -4,7 +4,6 @@ import { HomeComponent } from './home/home.component';
 import { ContactComponent } from './components/contact/contact.component';
 import { AfspraakComponent } from './afspraak/afspraak.component';
 import { PortfolioComponent } from './portfolio/portfolio.component';
-import { BeheerComponent } from './beheer/beheer.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -12,7 +11,7 @@ const routes: Routes = [
   { path: 'contact', component: ContactComponent },
   { path: 'afspraak', component: AfspraakComponent },
   { path: 'portfolio', component: PortfolioComponent },
-  { path: 'beheer', component: BeheerComponent },
+  { path: 'beheer', loadChildren: () => import('./beheer/beheer.module').then(m => m.BeheerModule) },
 ];
 
 @NgModule({

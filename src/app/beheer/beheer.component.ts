@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, NgZone, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service';
-import { BehandelingCard, DataService, PortfolioCase, PortfolioFotoItem } from '../services/data.service';
+import { BehandelingCard, DataService, PortfolioCase, PortfolioFotoItem, TekstenData } from '../services/data.service';
 
 @Component({
   standalone: false,
@@ -12,10 +12,11 @@ export class BeheerComponent implements OnInit, AfterViewInit {
   ingelogd = false;
   loginFout = '';
 
-  actieveTab: 'portfolio' | 'behandelingen' | 'instellingen' = 'portfolio';
+  actieveTab: 'portfolio' | 'behandelingen' | 'teksten' | 'instellingen' = 'portfolio';
 
   portfolioCases: PortfolioCase[] = [];
   behandelingen: BehandelingCard[] = [];
+  teksten!: TekstenData;
 
   opslaanMelding = '';
   resetBevestiging = false;
@@ -96,11 +97,13 @@ export class BeheerComponent implements OnInit, AfterViewInit {
   private laadData(): void {
     this.portfolioCases = this.dataService.getPortfolio();
     this.behandelingen  = this.dataService.getBehandelingen();
+    this.teksten        = this.dataService.getTeksten();
   }
 
   opslaan(): void {
     this.dataService.savePortfolio(this.portfolioCases);
     this.dataService.saveBehandelingen(this.behandelingen);
+    this.dataService.saveTeksten(this.teksten);
     this.opslaanMelding = 'Wijzigingen opgeslagen!';
     setTimeout(() => (this.opslaanMelding = ''), 3000);
   }

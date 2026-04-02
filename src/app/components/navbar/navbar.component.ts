@@ -8,8 +8,12 @@ import { Router } from '@angular/router';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
+  menuOpen = false;
 
   constructor(private router: Router) {}
+
+  toggleMenu(): void { this.menuOpen = !this.menuOpen; }
+  closeMenu(): void  { this.menuOpen = false; }
 
   scrollTo(fragment: string): void {
     if (this.router.url.startsWith('/home')) {

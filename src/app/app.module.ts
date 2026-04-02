@@ -16,12 +16,9 @@ import { KroonBrugwerkComponent } from './werkzaamheden/kroon-brugwerk/kroon-bru
 import { HeaderComponent } from './components/header/header.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { ContactComponent } from './components/contact/contact.component';
-import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
-import { InMemoryDataService } from './in-memory-data.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { TruncatePipe } from './werkzaamheden/truncate.pipe';
 import { PortfolioComponent } from './portfolio/portfolio.component';
-import { BeheerComponent } from './beheer/beheer.component';
 
 @NgModule({
   declarations: [
@@ -40,13 +37,11 @@ import { BeheerComponent } from './beheer/beheer.component';
     AfspraakComponent,
     TruncatePipe,
     PortfolioComponent,
-    BeheerComponent,
   ],
   imports: [
     BrowserModule,
     ReactiveFormsModule,
     FormsModule,
-    InMemoryWebApiModule.forRoot(InMemoryDataService),
     AppRoutingModule
   ],
   providers: [

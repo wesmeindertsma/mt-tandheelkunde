@@ -1,4 +1,5 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { DataService, PortfolioCase, PortfolioFotoItem } from '../services/data.service';
 
 @Component({
@@ -7,16 +8,22 @@ import { DataService, PortfolioCase, PortfolioFotoItem } from '../services/data.
   templateUrl: './portfolio.component.html',
   styleUrl: './portfolio.component.css'
 })
-export class PortfolioComponent implements OnInit {
+export class PortfolioComponent implements OnInit, OnDestroy {
   cases: PortfolioCase[] = [];
 
   activeCaseId: string | null = null;
   activeFotoIndex = 0;
 
+  private sub!: Subscription;
+
   constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
-    this.cases = this.dataService.getPortfolio();
+    this.sub = this.dataService.portfolio$.subscribe(cases => this.cases = cases);
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   /** Platte lijst van alle foto's voor het grid */

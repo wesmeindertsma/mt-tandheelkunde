@@ -5,17 +5,20 @@
       <h1><a routerLink="/home">MT <span>Tandheelkunde</span></a></h1>
     </div>
 
-    <nav id="navbar" class="navbar order-last order-lg-0">
+    <nav id="navbar" class="navbar order-last order-lg-0" [class.navbar-mobile]="menuOpen">
       <ul>
-        <li><a class="nav-link" style="cursor:pointer" (click)="scrollTo('wie-ik-ben')">Wie ben ik</a></li>
-        <li><a class="nav-link" style="cursor:pointer" (click)="scrollTo('wat-ik-doe')">Behandelingen</a></li>
-        <li><a class="nav-link" style="cursor:pointer" (click)="scrollTo('portfolio')">Portfolio</a></li>
-        <li><a class="nav-link" style="cursor:pointer" (click)="scrollTo('contact')">Contact</a></li>
-        <li><a class="btn-afspraak" style="cursor:pointer" (click)="scrollTo('afspraak')">
+        <li><a class="nav-link" style="cursor:pointer" (click)="scrollTo('wie-ik-ben'); closeMenu()">Wie ben ik</a></li>
+        <li><a class="nav-link" style="cursor:pointer" (click)="scrollTo('wat-ik-doe'); closeMenu()">Behandelingen</a></li>
+        <li><a class="nav-link" style="cursor:pointer" (click)="scrollTo('portfolio'); closeMenu()">Portfolio</a></li>
+        <li><a class="nav-link" style="cursor:pointer" (click)="scrollTo('contact'); closeMenu()">Contact</a></li>
+        <li><a class="btn-afspraak" style="cursor:pointer" (click)="scrollTo('afspraak'); closeMenu()">
           <i class="bi bi-calendar-check me-1"></i>Afspraak
         </a></li>
       </ul>
-      <i class="bi bi-list mobile-nav-toggle"></i>
+      <i class="bi mobile-nav-toggle"
+         [class.bi-list]="!menuOpen"
+         [class.bi-x]="menuOpen"
+         (click)="toggleMenu()"></i>
     </nav>
 
     <div class="header-social-links d-flex align-items-center">
