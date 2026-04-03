@@ -5,7 +5,6 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
-import { provideStorage, getStorage } from '@angular/fire/storage';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -49,7 +48,6 @@ const firebaseConfig = {
     provideHttpClient(withInterceptorsFromDi()),
     provideFirebaseApp(() => initializeApp(firebaseConfig)),
     provideFirestore(() => getFirestore()),
-    provideStorage(() => getStorage()),
   ],
   bootstrap: [AppComponent]
 })

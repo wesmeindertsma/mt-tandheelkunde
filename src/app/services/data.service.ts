@@ -1,11 +1,13 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Firestore, doc, setDoc, onSnapshot } from '@angular/fire/firestore';
-import { Storage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
+import {
+  Firestore, doc, setDoc, onSnapshot,
+  collection, query, orderBy, writeBatch, getDocs,
+} from '@angular/fire/firestore';
 
 export interface PortfolioFotoItem {
   id: string;
-  src: string;      // Firebase Storage URL of relatief pad voor standaardfotos
+  src: string;      // base64 of assets-pad voor standaardfotos
   caption: string;
 }
 
@@ -127,11 +129,10 @@ const STANDAARD_TEKSTEN: TekstenData = {
   openingstijdDiVr: 'Di t/m vrijdag: 08:00 – 17:00 uur',
 };
 
-// localStorage-sleutels als snelle cache voor eerste render
-const LS_PORTFOLIO    = 'mt_portfolio_v1';
+const LS_PORTFOLIO     = 'mt_portfolio_v1';
 const LS_BEHANDELINGEN = 'mt_behandelingen_v1';
-const LS_TEKSTEN      = 'mt_teksten_v1';
-const LS_WACHTWOORD   = 'mt_beheer_pwd';
+const LS_TEKSTEN       = 'mt_teksten_v1';
+const LS_WACHTWOORD    = 'mt_beheer_pwd';
 
 function getCached<T>(key: string, fallback: T): T {
   try {
@@ -154,17 +155,14 @@ export class DataService implements OnDestroy {
   private _teksten$       = new BehaviorSubject<TekstenData>(getCached(LS_TEKSTEN, STANDAARD_TEKSTEN));
   teksten$: Observable<TekstenData> = this._teksten$.asObservable();
 
-  private unsubFirestore: (() => void) | undefined;
+  private unsubMeta:      (() => void) | undefined;
+  private unsubPortfolio: (() => void) | undefined;
 
-  constructor(private firestore: Firestore, private storage: Storage) {
-    // Real-time listener: zodra Firestore data binnenkomt, update alles
-    this.unsubFirestore = onSnapshot(doc(this.firestore, 'site/data'), snap => {
+  constructor(private firestore: Firestore) {
+    // Real-time listener: behandelingen + teksten
+    this.unsubMeta = onSnapshot(doc(this.firestore, 'site/data'), snap => {
       const d = snap.data();
       if (!d) return;
-      if (Array.isArray(d['portfolio'])) {
-        localStorage.setItem(LS_PORTFOLIO, JSON.stringify(d['portfolio']));
-        this._portfolio$.next(d['portfolio']);
-      }
       if (Array.isArray(d['behandelingen'])) {
         localStorage.setItem(LS_BEHANDELINGEN, JSON.stringify(d['behandelingen']));
         this._behandelingen$.next(d['behandelingen']);
@@ -174,55 +172,110 @@ export class DataService implements OnDestroy {
         this._teksten$.next(d['teksten']);
       }
     });
+
+    // Real-time listener: portfolio cases (gesorteerd op volgorde)
+    this.unsubPortfolio = onSnapshot(
+      query(collection(this.firestore, 'portfolioCases'), orderBy('order')),
+      snapshot => {
+        const cases = snapshot.docs.map(d => {
+          const { order: _order, ...rest } = d.data();
+          return rest as PortfolioCase;
+        });
+        localStorage.setItem(LS_PORTFOLIO, JSON.stringify(cases));
+        this._portfolio$.next(cases);
+      }
+    );
   }
 
   ngOnDestroy(): void {
-    this.unsubFirestore?.();
+    this.unsubMeta?.();
+    this.unsubPortfolio?.();
   }
 
   // ─── Synchrone snapshots (voor beheer-initialisatie) ───
 
-  getPortfolio(): PortfolioCase[]     { return this._portfolio$.value; }
+  getPortfolio(): PortfolioCase[]       { return this._portfolio$.value; }
   getBehandelingen(): BehandelingCard[] { return this._behandelingen$.value; }
-  getTeksten(): TekstenData           { return this._teksten$.value; }
+  getTeksten(): TekstenData             { return this._teksten$.value; }
 
   // ─── Opslaan naar Firestore ────────────────────────────
-  // Bestaande base64-afbeeldingen worden automatisch naar
-  // Firebase Storage gemigreerd voor ze in Firestore belanden.
 
   async savePortfolio(cases: PortfolioCase[]): Promise<void> {
-    const migrated = await this.migratePortfolioImages(cases);
-    await setDoc(doc(this.firestore, 'site/data'), { portfolio: migrated }, { merge: true });
+    const batch = writeBatch(this.firestore);
+
+    // Verwijder cases die niet meer bestaan
+    const existing = await getDocs(collection(this.firestore, 'portfolioCases'));
+    const nieuweIds = new Set(cases.map(c => c.id));
+    for (const d of existing.docs) {
+      if (!nieuweIds.has(d.id)) batch.delete(d.ref);
+    }
+
+    // Sla alle huidige cases op met volgordenummer
+    cases.forEach((c, index) => {
+      batch.set(doc(this.firestore, 'portfolioCases', c.id), { ...c, order: index });
+    });
+
+    await batch.commit();
   }
 
   async saveBehandelingen(behandelingen: BehandelingCard[]): Promise<void> {
-    const migrated = await this.migrateBehandelingenImages(behandelingen);
-    await setDoc(doc(this.firestore, 'site/data'), { behandelingen: migrated }, { merge: true });
+    await setDoc(doc(this.firestore, 'site/data'), { behandelingen }, { merge: true });
   }
 
   async saveTeksten(teksten: TekstenData): Promise<void> {
     await setDoc(doc(this.firestore, 'site/data'), { teksten }, { merge: true });
   }
 
-  // ─── Foto uploaden naar Firebase Storage ───────────────
-
-  async uploadImage(file: File, storagePath: string): Promise<string> {
-    const blob = await this.compressToBlob(file);
-    const storageRef = ref(this.storage, storagePath);
-    await uploadBytes(storageRef, blob);
-    return getDownloadURL(storageRef);
-  }
-
   // ─── Reset naar standaarddata ──────────────────────────
 
   async reset(): Promise<void> {
-    const data = {
-      portfolio:     JSON.parse(JSON.stringify(STANDAARD_PORTFOLIO)),
+    const batch = writeBatch(this.firestore);
+
+    // Verwijder bestaande portfolio cases
+    const existing = await getDocs(collection(this.firestore, 'portfolioCases'));
+    for (const d of existing.docs) batch.delete(d.ref);
+
+    // Zet standaard portfolio terug
+    const stdPortfolio: PortfolioCase[] = JSON.parse(JSON.stringify(STANDAARD_PORTFOLIO));
+    stdPortfolio.forEach((c, index) => {
+      batch.set(doc(this.firestore, 'portfolioCases', c.id), { ...c, order: index });
+    });
+
+    // Zet meta terug
+    batch.set(doc(this.firestore, 'site/data'), {
       behandelingen: JSON.parse(JSON.stringify(STANDAARD_BEHANDELINGEN)),
       teksten:       JSON.parse(JSON.stringify(STANDAARD_TEKSTEN)),
-    };
-    await setDoc(doc(this.firestore, 'site/data'), data);
-    // Firestore-listener pikt dit op en updatet de subjects automatisch
+    });
+
+    await batch.commit();
+  }
+
+  // ─── Hulpmethodes ──────────────────────────────────────
+
+  nieuwId(): string {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
+
+  /** Comprimeer afbeelding naar base64 voor Firestore-opslag */
+  compressImage(file: File, maxWidth = 900): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = e => {
+        const img = new Image();
+        img.src = e.target!.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let w = img.width, h = img.height;
+          if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.75));
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
   }
 
   // ─── Wachtwoord (blijft lokaal) ────────────────────────
@@ -233,96 +286,5 @@ export class DataService implements OnDestroy {
 
   saveWachtwoord(pwd: string): void {
     if (pwd.trim()) localStorage.setItem(LS_WACHTWOORD, pwd.trim());
-  }
-
-  // ─── Hulpmethodes ──────────────────────────────────────
-
-  nieuwId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  }
-
-  /** Comprimeer File naar base64 (voor directe preview in beheer) */
-  async compressImage(file: File, maxWidth = 1400): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = e => {
-        const img = new Image();
-        img.src = e.target!.result as string;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let w = img.width, h = img.height;
-          if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', 0.82));
-        };
-        img.onerror = reject;
-      };
-      reader.onerror = reject;
-    });
-  }
-
-  /** Comprimeer File naar Blob (voor Storage-upload) */
-  private compressToBlob(file: File, maxWidth = 1400): Promise<Blob> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = e => {
-        const img = new Image();
-        img.src = e.target!.result as string;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let w = img.width, h = img.height;
-          if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
-          canvas.toBlob(
-            blob => blob ? resolve(blob) : reject(new Error('Canvas toBlob mislukt')),
-            'image/jpeg', 0.82
-          );
-        };
-        img.onerror = reject;
-      };
-      reader.onerror = reject;
-    });
-  }
-
-  /** Converteer base64 data-URL naar Blob */
-  private base64ToBlob(dataUrl: string): Blob {
-    const [header, base64] = dataUrl.split(',');
-    const mime = header.match(/:(.*?);/)?.[1] ?? 'image/jpeg';
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    return new Blob([bytes], { type: mime });
-  }
-
-  /** Upload base64-afbeeldingen in portfolio naar Storage */
-  private async migratePortfolioImages(cases: PortfolioCase[]): Promise<PortfolioCase[]> {
-    const result: PortfolioCase[] = JSON.parse(JSON.stringify(cases));
-    for (const c of result) {
-      for (const f of c.fotos) {
-        if (f.src.startsWith('data:')) {
-          const storageRef = ref(this.storage, `portfolio/${c.id}/${f.id}`);
-          await uploadBytes(storageRef, this.base64ToBlob(f.src));
-          f.src = await getDownloadURL(storageRef);
-        }
-      }
-    }
-    return result;
-  }
-
-  /** Upload base64-afbeeldingen in behandelingen naar Storage */
-  private async migrateBehandelingenImages(behandelingen: BehandelingCard[]): Promise<BehandelingCard[]> {
-    const result: BehandelingCard[] = JSON.parse(JSON.stringify(behandelingen));
-    for (const b of result) {
-      if (b.foto.startsWith('data:')) {
-        const storageRef = ref(this.storage, `behandelingen/${b.id}`);
-        await uploadBytes(storageRef, this.base64ToBlob(b.foto));
-        b.foto = await getDownloadURL(storageRef);
-      }
-    }
-    return result;
   }
 }

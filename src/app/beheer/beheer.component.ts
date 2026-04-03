@@ -157,12 +157,9 @@ export class BeheerComponent implements OnInit, AfterViewInit {
   async uploadPortfolioFoto(caseIndex: number, fotoIndex: number, event: Event): Promise<void> {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
-    const c = this.portfolioCases[caseIndex];
-    const f = c.fotos[fotoIndex];
     try {
-      f.src = await this.dataService.compressImage(file); // directe preview
-      f.src = await this.dataService.uploadImage(file, `portfolio/${c.id}/${f.id}`);
-    } catch { alert('Fout bij uploaden van afbeelding.'); }
+      this.portfolioCases[caseIndex].fotos[fotoIndex].src = await this.dataService.compressImage(file);
+    } catch { alert('Fout bij laden van afbeelding.'); }
   }
 
   // ─── Behandelingen ─────────────────────────────────────
@@ -176,11 +173,9 @@ export class BeheerComponent implements OnInit, AfterViewInit {
   async uploadBehandelingFoto(index: number, event: Event): Promise<void> {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
-    const b = this.behandelingen[index];
     try {
-      b.foto = await this.dataService.compressImage(file); // directe preview
-      b.foto = await this.dataService.uploadImage(file, `behandelingen/${b.id}`);
-    } catch { alert('Fout bij uploaden van afbeelding.'); }
+      this.behandelingen[index].foto = await this.dataService.compressImage(file, 600);
+    } catch { alert('Fout bij laden van afbeelding.'); }
   }
 
   // ─── Instellingen ──────────────────────────────────────
