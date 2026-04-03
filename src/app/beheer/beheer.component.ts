@@ -121,7 +121,7 @@ export class BeheerComponent implements OnInit, AfterViewInit {
   // ─── Portfolio: cases ──────────────────────────────────
 
   nieuwCase(): void {
-    this.portfolioCases.push({ id: this.dataService.nieuwId(), behandeling: 'Nieuwe behandeling', fotos: [] });
+    this.portfolioCases.unshift({ id: this.dataService.nieuwId(), behandeling: 'Nieuwe behandeling', fotos: [] });
   }
 
   verwijderCase(index: number): void { this.portfolioCases.splice(index, 1); }
@@ -168,7 +168,7 @@ export class BeheerComponent implements OnInit, AfterViewInit {
   // ─── Behandelingen ─────────────────────────────────────
 
   nieuweBehandeling(): void {
-    this.behandelingen.push({ id: this.dataService.nieuwId(), titel: 'Nieuwe behandeling', foto: '', beschrijving: '' });
+    this.behandelingen.unshift({ id: this.dataService.nieuwId(), titel: 'Nieuwe behandeling', foto: '', beschrijving: '' });
   }
 
   verwijderBehandeling(index: number): void { this.behandelingen.splice(index, 1); }
