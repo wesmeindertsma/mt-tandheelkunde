@@ -14,19 +14,15 @@
 }
 
 .behandeling-card-img {
-  height: 360px;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
-}
-
-@media (max-width: 575px) {
-  .behandeling-card-img { height: 260px; }
 }
 
 .behandeling-card-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center center;
+  object-position: center 40%;
   transition: transform 0.35s;
 }
 
@@ -131,15 +127,19 @@
 }
 
 .beh-modal-img {
-  height: 260px;
-  overflow: hidden;
   border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  max-height: 55vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f4f5;
 }
 
 .beh-modal-img img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .beh-modal-body {
@@ -171,6 +171,5 @@
 }
 
 @media (max-width: 576px) {
-  .beh-modal-img { height: 200px; }
   .beh-modal-body { padding: 20px; }
 }

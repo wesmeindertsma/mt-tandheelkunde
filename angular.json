@@ -33,6 +33,7 @@
             "assets": [
               "src/favicon.ico",
               "src/favicon.svg",
+              "src/favicon.png",
               "src/.htaccess",
               "src/assets"
             ],
