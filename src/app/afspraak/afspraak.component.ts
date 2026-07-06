@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import emailjs from '@emailjs/browser';
 
@@ -12,7 +12,7 @@ const EMAILJS_TEMPLATE_ID = 'template_ylska8w';
   templateUrl: './afspraak.component.html',
   styleUrls: ['./afspraak.component.css']
 })
-export class AfspraakComponent {
+export class AfspraakComponent implements OnInit {
   afspraakForm: FormGroup;
   verzonden    = false;
   isVerzenden  = false;
@@ -29,19 +29,40 @@ export class AfspraakComponent {
 
   constructor(private fb: FormBuilder) {
     this.afspraakForm = this.fb.group({
-      voornaam:   ['', [Validators.required, Validators.minLength(2)]],
-      achternaam: ['', [Validators.required, Validators.minLength(2)]],
-      email:      ['', [Validators.required, Validators.email]],
-      telefoon:   ['', [Validators.required, Validators.pattern(/^[0-9\s\+\-]{8,}$/)]],
-      behandeling:['', Validators.required],
-      datum:      [''],
-      bericht:    [''],
-      privacy:    [false, Validators.requiredTrue]
+      formulierType: ['afspraak'],
+      voornaam:      ['', [Validators.required, Validators.minLength(2)]],
+      achternaam:    ['', [Validators.required, Validators.minLength(2)]],
+      email:         ['', [Validators.required, Validators.email]],
+      telefoon:      ['', [Validators.required, Validators.pattern(/^[0-9\s\+\-]{8,}$/)]],
+      praktijkNaam:  [''],
+      patientNaam:   [''],
+      behandeling:   ['', Validators.required],
+      datum:         [''],
+      bericht:       [''],
+      privacy:       [false, Validators.requiredTrue]
+    });
+  }
+
+  ngOnInit(): void {
+    this.f['formulierType'].valueChanges.subscribe((type: string) => {
+      const patientNaam = this.f['patientNaam'];
+      if (type === 'doorverwijzing') {
+        patientNaam.setValidators([Validators.required, Validators.minLength(2)]);
+      } else {
+        patientNaam.clearValidators();
+        patientNaam.setValue('');
+        this.f['praktijkNaam'].setValue('');
+      }
+      patientNaam.updateValueAndValidity();
     });
   }
 
   get f() {
     return this.afspraakForm.controls;
+  }
+
+  get isDoorverwijzing(): boolean {
+    return this.f['formulierType'].value === 'doorverwijzing';
   }
 
   onSubmit(): void {
@@ -55,26 +76,42 @@ export class AfspraakComponent {
 
     const v = this.afspraakForm.value;
 
-    emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID,
-      {
-        voornaam:    v.voornaam,
-        achternaam:  v.achternaam,
-        email:       v.email,
-        telefoon:    v.telefoon,
-        behandeling: v.behandeling,
-        datum:       v.datum || '—',
-        bericht:     v.bericht || '—',
-        reply_to:    v.email
-      },
-      EMAILJS_PUBLIC_KEY
-    ).then(() => {
-      this.verzonden   = true;
-      this.isVerzenden = false;
-    }).catch(() => {
-      this.verzendFout  = true;
-      this.isVerzenden  = false;
-    });
+    const templateParams = this.isDoorverwijzing
+      ? {
+          doorverwijzing:  'Ja',
+          voornaam:        v.voornaam,
+          achternaam:      v.achternaam,
+          email:           v.email,
+          telefoon:        v.telefoon,
+          praktijkNaam:    v.praktijkNaam || '—',
+          patientNaam:     v.patientNaam,
+          behandeling:     v.behandeling,
+          datum:           v.datum || '—',
+          bericht:         v.bericht || '—',
+          reply_to:        v.email
+        }
+      : {
+          doorverwijzing:  'Nee',
+          voornaam:        v.voornaam,
+          achternaam:      v.achternaam,
+          email:           v.email,
+          telefoon:        v.telefoon,
+          praktijkNaam:    '—',
+          patientNaam:     '—',
+          behandeling:     v.behandeling,
+          datum:           v.datum || '—',
+          bericht:         v.bericht || '—',
+          reply_to:        v.email
+        };
+
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams, EMAILJS_PUBLIC_KEY)
+      .then(() => {
+        this.verzonden   = true;
+        this.isVerzenden = false;
+      })
+      .catch(() => {
+        this.verzendFout  = true;
+        this.isVerzenden  = false;
+      });
   }
 }

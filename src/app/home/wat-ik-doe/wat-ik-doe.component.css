@@ -14,14 +14,19 @@
 }
 
 .behandeling-card-img {
-  height: 220px;
+  height: 360px;
   overflow: hidden;
+}
+
+@media (max-width: 575px) {
+  .behandeling-card-img { height: 260px; }
 }
 
 .behandeling-card-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center center;
   transition: transform 0.35s;
 }
 

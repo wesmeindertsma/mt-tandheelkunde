@@ -21,6 +21,7 @@ export class BeheerComponent implements OnInit, AfterViewInit {
   opslaanMelding = '';
   opslaanBusy = false;
   resetBevestiging = false;
+  focalBusy: Record<string, boolean> = {};
 
   delenOpen: Record<string, boolean> = {};
   delenTekst: Record<string, string> = {};
@@ -99,6 +100,16 @@ export class BeheerComponent implements OnInit, AfterViewInit {
     this.portfolioCases = JSON.parse(JSON.stringify(this.dataService.getPortfolio()));
     this.behandelingen  = JSON.parse(JSON.stringify(this.dataService.getBehandelingen()));
     this.teksten        = JSON.parse(JSON.stringify(this.dataService.getTeksten()));
+    this.detecteerFocusVoorAlle();
+  }
+
+  private async detecteerFocusVoorAlle(): Promise<void> {
+    const nodig = this.behandelingen.filter(b => b.foto && b.focalY === undefined);
+    for (const b of nodig) {
+      this.focalBusy[b.id] = true;
+      b.focalY = await this.dataService.detectMondFocus(b.foto);
+      this.focalBusy[b.id] = false;
+    }
   }
 
   async opslaan(): Promise<void> {
@@ -174,7 +185,11 @@ export class BeheerComponent implements OnInit, AfterViewInit {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
     try {
-      this.behandelingen[index].foto = await this.dataService.compressImage(file, 600);
+      const b = this.behandelingen[index];
+      b.foto = await this.dataService.compressImage(file, 600);
+      this.focalBusy[b.id] = true;
+      b.focalY = await this.dataService.detectMondFocus(b.foto);
+      this.focalBusy[b.id] = false;
     } catch { alert('Fout bij laden van afbeelding.'); }
   }
 

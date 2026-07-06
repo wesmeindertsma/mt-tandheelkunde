@@ -239,6 +239,12 @@ ol, ul { list-style: none; margin: 0; padding: 0; }
   color: var(--clr-white) !important;
 }
 
+.btn-afspraak-sep {
+  opacity: 0.55;
+  font-weight: 300;
+  margin: 0 1px;
+}
+
 /* Header Social Links */
 .header-social-links {
   margin: 0 0 0 20px;
@@ -697,6 +703,55 @@ section {
 
 @media (max-width: 768px) {
   .afspraak-card { padding: 24px; }
+}
+
+.form-type-toggle {
+  display: flex;
+  gap: 12px;
+}
+
+.form-type-option {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 12px;
+  border: 2px solid var(--clr-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition);
+  background: var(--clr-bg);
+  color: var(--clr-text-muted);
+}
+
+.form-type-option i {
+  font-size: 1.4rem;
+  margin-bottom: 2px;
+}
+
+.form-type-option strong {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.form-type-option small {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.form-type-option.active {
+  border-color: var(--clr-primary);
+  background: var(--clr-primary-xlight, #eaf5f7);
+  color: var(--clr-primary);
+}
+
+.form-type-option:hover:not(.active) {
+  border-color: var(--clr-primary-light, #7dc4cf);
+  color: var(--clr-primary);
 }
 
 .form-label {

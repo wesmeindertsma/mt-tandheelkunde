@@ -24,6 +24,8 @@ export interface BehandelingCard {
   foto: string;
   beschrijving: string;
   detailTekst?: string;
+  focalY?: number; // 0–100: verticale focuspositie voor object-position (auto-gedetecteerd)
+  zoom?:   number; // 0.5–2.5: zoomniveau (1 = normaal)
 }
 
 export interface TekstenData {
@@ -275,6 +277,58 @@ export class DataService implements OnDestroy {
         img.onerror = reject;
       };
       reader.onerror = reject;
+    });
+  }
+
+  /**
+   * Analyseert een afbeelding via Canvas en geeft de beste verticale focuspositie
+   * terug (0–100%) zodat de mond/glimlach altijd goed in beeld staat.
+   * Scoort horizontale banden op roodtint (lippen/tandvlees) × contrast (tanden).
+   */
+  detectMondFocus(src: string): Promise<number> {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        const targetW = 80;
+        const canvas  = document.createElement('canvas');
+        canvas.width  = targetW;
+        canvas.height = Math.round(img.height * targetW / img.width);
+        const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const w = canvas.width;
+        const h = canvas.height;
+        const bandH = Math.max(2, Math.round(h * 0.12)); // 12%-band
+
+        let bestScore = -Infinity;
+        let bestY = 50;
+
+        for (let y = 0; y <= h - bandH; y += 2) {
+          let redSum = 0, lumaSum = 0, lumaSqSum = 0, count = 0;
+          for (let row = y; row < y + bandH && row < h; row++) {
+            for (let x = 0; x < w; x++) {
+              const i   = (row * w + x) * 4;
+              const r   = data[i], g = data[i + 1], b = data[i + 2];
+              const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+              redSum    += r - (g + b) / 2;
+              lumaSum   += luma;
+              lumaSqSum += luma * luma;
+              count++;
+            }
+          }
+          const avgLuma  = lumaSum / count;
+          const contrast = Math.sqrt(Math.max(0, lumaSqSum / count - avgLuma * avgLuma));
+          const score    = (redSum / count + 128) * contrast;
+          if (score > bestScore) {
+            bestScore = score;
+            bestY = Math.round((y + bandH / 2) / h * 100);
+          }
+        }
+        resolve(Math.max(5, Math.min(95, bestY)));
+      };
+      img.onerror = () => resolve(50);
+      img.src = src;
     });
   }
 

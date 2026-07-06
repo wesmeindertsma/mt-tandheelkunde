@@ -177,56 +177,99 @@
 
       <div class="behandeling-card-admin" *ngFor="let b of behandelingen; let bi = index; trackBy: trackBehandeling">
 
-        <div class="beh-foto-col">
-          <img *ngIf="b.foto" [src]="b.foto" class="beh-preview" [alt]="b.titel">
-          <div class="foto-preview-empty" *ngIf="!b.foto"><i class="bi bi-image"></i></div>
-          <label class="foto-upload-btn" [for]="'beh-upload-' + b.id">
-            <i class="bi bi-cloud-upload"></i>
-            <input
-              [id]="'beh-upload-' + b.id"
-              type="file"
-              accept="image/*"
-              class="d-none"
-              (change)="uploadBehandelingFoto(bi, $event)">
-          </label>
+        <!-- Rij 1: foto-upload | tekstvelden | verwijder -->
+        <div class="beh-top-row">
+          <div class="beh-foto-col">
+            <img *ngIf="b.foto" [src]="b.foto" class="beh-preview" [alt]="b.titel">
+            <div class="foto-preview-empty" *ngIf="!b.foto"><i class="bi bi-image"></i></div>
+            <label class="foto-upload-btn" [for]="'beh-upload-' + b.id">
+              <i class="bi bi-cloud-upload"></i>
+              <input
+                [id]="'beh-upload-' + b.id"
+                type="file"
+                accept="image/*"
+                class="d-none"
+                (change)="uploadBehandelingFoto(bi, $event)">
+            </label>
+          </div>
+
+          <div class="beh-meta-col">
+            <div class="mb-2">
+              <label class="form-label-sm">Titel</label>
+              <input
+                class="form-control"
+                type="text"
+                [value]="b.titel"
+                (input)="b.titel = $any($event.target).value"
+                placeholder="Titel behandeling">
+            </div>
+            <div class="mb-2">
+              <label class="form-label-sm">Korte beschrijving (op de kaart)</label>
+              <textarea
+                class="form-control"
+                rows="2"
+                [value]="b.beschrijving"
+                (input)="b.beschrijving = $any($event.target).value"
+                placeholder="Korte beschrijving van de behandeling">
+              </textarea>
+            </div>
+            <div>
+              <label class="form-label-sm">Uitgebreide tekst (in de popup)</label>
+              <textarea
+                class="form-control"
+                rows="6"
+                [value]="b.detailTekst ?? ''"
+                (input)="b.detailTekst = $any($event.target).value"
+                placeholder="Uitgebreide uitleg, werkwijze, kosten… (lege regels worden als alinea-scheiding gebruikt)">
+              </textarea>
+            </div>
+          </div>
+
+          <div class="beh-acties-col">
+            <button class="btn-icon danger" title="Verwijderen" (click)="verwijderBehandeling(bi)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
         </div>
 
-        <div class="beh-meta-col">
-          <div class="mb-2">
-            <label class="form-label-sm">Titel</label>
+        <!-- Rij 2: fotouitsnede (preview + sliders) -->
+        <div class="beh-focal-row" *ngIf="b.foto">
+          <div class="focal-preview-wrap">
+            <img [src]="b.foto" class="focal-preview-img"
+                 [style.object-position]="'center ' + (b.focalY ?? 50) + '%'"
+                 [style.transform]="'scale(' + (b.zoom ?? 1) + ')'"
+                 [style.transform-origin]="'center ' + (b.focalY ?? 50) + '%'">
+            <span class="focal-badge">{{ b.focalY ?? 50 }}% · {{ (b.zoom ?? 1).toFixed(2) }}×</span>
+          </div>
+          <div class="focal-controls">
+            <div class="focal-row-label">
+              <span><i class="bi bi-magic me-1"></i>Fotouitsnede
+                <span *ngIf="focalBusy[b.id]" class="focal-spinner">
+                  <span class="spinner-border spinner-border-sm"></span>
+                </span>
+              </span>
+            </div>
+            <div class="focal-row-label mt-2">
+              <span>Positie (verticaal)</span>
+              <span class="focal-val">{{ b.focalY ?? 50 }}%</span>
+            </div>
             <input
-              class="form-control"
-              type="text"
-              [value]="b.titel"
-              (input)="b.titel = $any($event.target).value"
-              placeholder="Titel behandeling">
+              type="range" class="form-range"
+              min="0" max="100" step="1"
+              [value]="b.focalY ?? 50"
+              [disabled]="focalBusy[b.id]"
+              (input)="b.focalY = +$any($event.target).value">
+            <div class="focal-row-label mt-2">
+              <span>Zoom</span>
+              <span class="focal-val">{{ (b.zoom ?? 1).toFixed(2) }}×</span>
+            </div>
+            <input
+              type="range" class="form-range"
+              min="0.5" max="2.5" step="0.05"
+              [value]="b.zoom ?? 1"
+              (input)="b.zoom = +$any($event.target).value">
+            <div class="focal-hint mt-1">Positie wordt auto-gedetecteerd bij uploaden · sleep sliders om bij te stellen</div>
           </div>
-          <div class="mb-2">
-            <label class="form-label-sm">Korte beschrijving (op de kaart)</label>
-            <textarea
-              class="form-control"
-              rows="2"
-              [value]="b.beschrijving"
-              (input)="b.beschrijving = $any($event.target).value"
-              placeholder="Korte beschrijving van de behandeling">
-            </textarea>
-          </div>
-          <div>
-            <label class="form-label-sm">Uitgebreide tekst (in de popup)</label>
-            <textarea
-              class="form-control"
-              rows="6"
-              [value]="b.detailTekst ?? ''"
-              (input)="b.detailTekst = $any($event.target).value"
-              placeholder="Uitgebreide uitleg, werkwijze, kosten… (lege regels worden als alinea-scheiding gebruikt)">
-            </textarea>
-          </div>
-        </div>
-
-        <div class="beh-acties-col">
-          <button class="btn-icon danger" title="Verwijderen" (click)="verwijderBehandeling(bi)">
-            <i class="bi bi-trash"></i>
-          </button>
         </div>
 
       </div>

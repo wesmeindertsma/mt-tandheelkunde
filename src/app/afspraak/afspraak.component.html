@@ -3,7 +3,7 @@
 
     <div class="section-title">
       <span class="overline">Direct regelen</span>
-      <h2>Afspraak aanvragen</h2>
+      <h2>Afspraak maken of doorverwijzing aanvragen</h2>
       <p>Vul het formulier in en ik neem zo snel mogelijk contact met u op om een afspraak in te plannen.</p>
     </div>
 
@@ -16,36 +16,82 @@
           <div *ngIf="!verzonden">
             <form [formGroup]="afspraakForm" (ngSubmit)="onSubmit()" novalidate>
 
-              <!-- Naam -->
+              <!-- Formulier type toggle -->
+              <div class="form-type-toggle mb-4">
+                <label class="form-type-option" [class.active]="!isDoorverwijzing">
+                  <input type="radio" formControlName="formulierType" value="afspraak" class="visually-hidden">
+                  <i class="bi bi-calendar-check"></i>
+                  <strong>Afspraak maken</strong>
+                  <small>Als patiënt</small>
+                </label>
+                <label class="form-type-option" [class.active]="isDoorverwijzing">
+                  <input type="radio" formControlName="formulierType" value="doorverwijzing" class="visually-hidden">
+                  <i class="bi bi-person-lines-fill"></i>
+                  <strong>Verwijzing</strong>
+                  <small>Als zorgverlener</small>
+                </label>
+              </div>
+
+              <!-- Naam (zorgverlener of patiënt) -->
               <div class="row g-3 mb-3">
                 <div class="col-sm-6">
-                  <label class="form-label" for="voornaam">Voornaam <span class="text-danger">*</span></label>
+                  <label class="form-label" for="voornaam">
+                    {{ isDoorverwijzing ? 'Uw voornaam' : 'Voornaam' }} <span class="text-danger">*</span>
+                  </label>
                   <input
                     id="voornaam"
                     type="text"
                     class="form-control"
                     formControlName="voornaam"
-                    placeholder="Voornaam"
+                    [placeholder]="isDoorverwijzing ? 'Voornaam zorgverlener' : 'Voornaam'"
                     [class.is-invalid]="f['voornaam'].invalid && f['voornaam'].touched">
                   <div class="invalid-feedback">Vul uw voornaam in.</div>
                 </div>
                 <div class="col-sm-6">
-                  <label class="form-label" for="achternaam">Achternaam <span class="text-danger">*</span></label>
+                  <label class="form-label" for="achternaam">
+                    {{ isDoorverwijzing ? 'Uw achternaam' : 'Achternaam' }} <span class="text-danger">*</span>
+                  </label>
                   <input
                     id="achternaam"
                     type="text"
                     class="form-control"
                     formControlName="achternaam"
-                    placeholder="Achternaam"
+                    [placeholder]="isDoorverwijzing ? 'Achternaam zorgverlener' : 'Achternaam'"
                     [class.is-invalid]="f['achternaam'].invalid && f['achternaam'].touched">
                   <div class="invalid-feedback">Vul uw achternaam in.</div>
+                </div>
+              </div>
+
+              <!-- Praktijk + patiëntnaam (alleen doorverwijzing) -->
+              <div *ngIf="isDoorverwijzing" class="row g-3 mb-3">
+                <div class="col-sm-6">
+                  <label class="form-label" for="praktijkNaam">Praktijknaam</label>
+                  <input
+                    id="praktijkNaam"
+                    type="text"
+                    class="form-control"
+                    formControlName="praktijkNaam"
+                    placeholder="Naam van uw praktijk">
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label" for="patientNaam">Naam patiënt <span class="text-danger">*</span></label>
+                  <input
+                    id="patientNaam"
+                    type="text"
+                    class="form-control"
+                    formControlName="patientNaam"
+                    placeholder="Voor- en achternaam patiënt"
+                    [class.is-invalid]="f['patientNaam'].invalid && f['patientNaam'].touched">
+                  <div class="invalid-feedback">Vul de naam van de patiënt in.</div>
                 </div>
               </div>
 
               <!-- Contactgegevens -->
               <div class="row g-3 mb-3">
                 <div class="col-sm-6">
-                  <label class="form-label" for="email">E-mailadres <span class="text-danger">*</span></label>
+                  <label class="form-label" for="email">
+                    {{ isDoorverwijzing ? 'Uw e-mailadres' : 'E-mailadres' }} <span class="text-danger">*</span>
+                  </label>
                   <input
                     id="email"
                     type="email"
@@ -56,7 +102,9 @@
                   <div class="invalid-feedback">Vul een geldig e-mailadres in.</div>
                 </div>
                 <div class="col-sm-6">
-                  <label class="form-label" for="telefoon">Telefoonnummer <span class="text-danger">*</span></label>
+                  <label class="form-label" for="telefoon">
+                    {{ isDoorverwijzing ? 'Uw telefoonnummer' : 'Telefoonnummer' }} <span class="text-danger">*</span>
+                  </label>
                   <input
                     id="telefoon"
                     type="tel"
@@ -71,7 +119,9 @@
               <!-- Behandeling & Datum -->
               <div class="row g-3 mb-3">
                 <div class="col-sm-6">
-                  <label class="form-label" for="behandeling">Behandeling <span class="text-danger">*</span></label>
+                  <label class="form-label" for="behandeling">
+                    {{ isDoorverwijzing ? 'Reden / behandeling' : 'Behandeling' }} <span class="text-danger">*</span>
+                  </label>
                   <select
                     id="behandeling"
                     class="form-select"
@@ -95,13 +145,17 @@
 
               <!-- Bericht -->
               <div class="mb-3">
-                <label class="form-label" for="bericht">Bericht / Toelichting</label>
+                <label class="form-label" for="bericht">
+                  {{ isDoorverwijzing ? 'Toelichting / reden doorverwijzing' : 'Bericht / Toelichting' }}
+                </label>
                 <textarea
                   id="bericht"
                   class="form-control"
                   formControlName="bericht"
                   rows="4"
-                  placeholder="Heeft u nog aanvullende informatie of vragen? Laat het hier weten.">
+                  [placeholder]="isDoorverwijzing
+                    ? 'Geef hier een toelichting op de doorverwijzing, bijv. klachten of bijzonderheden.'
+                    : 'Heeft u nog aanvullende informatie of vragen? Laat het hier weten.'">
                 </textarea>
               </div>
 
@@ -115,7 +169,7 @@
                     formControlName="privacy"
                     [class.is-invalid]="f['privacy'].invalid && f['privacy'].touched">
                   <label class="form-check-label" for="privacy" style="font-size: 13px; color: var(--clr-text-muted);">
-                    Ik ga akkoord met het verwerken van mijn gegevens voor het inplannen van een afspraak. <span class="text-danger">*</span>
+                    Ik ga akkoord met het verwerken van deze gegevens voor het inplannen van een afspraak. <span class="text-danger">*</span>
                   </label>
                   <div class="invalid-feedback">U moet akkoord gaan om door te gaan.</div>
                 </div>
@@ -131,7 +185,7 @@
               <button type="submit" class="btn-submit" [disabled]="afspraakForm.invalid || isVerzenden">
                 <span *ngIf="!isVerzenden">
                   <i class="bi bi-send"></i>
-                  Aanvraag versturen
+                  {{ isDoorverwijzing ? 'Doorverwijzing versturen' : 'Aanvraag versturen' }}
                 </span>
                 <span *ngIf="isVerzenden">
                   <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -147,9 +201,9 @@
             <div class="succes-icoon">
               <i class="bi bi-check-lg"></i>
             </div>
-            <h3>Aanvraag verstuurd!</h3>
+            <h3>{{ isDoorverwijzing ? 'Doorverwijzing verstuurd!' : 'Aanvraag verstuurd!' }}</h3>
             <p>
-              Bedankt voor uw aanvraag. Ik neem zo snel mogelijk contact met u op om een afspraak in te plannen.
+              Bedankt voor uw aanvraag. Ik neem zo snel mogelijk contact op om een afspraak in te plannen.
             </p>
           </div>
 

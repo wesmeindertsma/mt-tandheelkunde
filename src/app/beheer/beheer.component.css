@@ -257,9 +257,15 @@
   padding: 16px;
   margin-bottom: 16px;
   display: flex;
+  flex-direction: column;
+  gap: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.beh-top-row {
+  display: flex;
   gap: 16px;
   align-items: flex-start;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .beh-foto-col {
@@ -280,6 +286,73 @@
 
 .beh-meta-col { flex: 1; }
 .beh-acties-col { flex-shrink: 0; }
+
+/* ─── Fotouitsnede rij ──────────────────────── */
+.beh-focal-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #e9ecef;
+}
+
+.focal-preview-wrap {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f0f4f5;
+}
+
+.focal-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.focal-badge {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-size: 10px;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: monospace;
+}
+
+.focal-controls {
+  flex: 1;
+}
+
+.focal-row-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 4px;
+}
+
+.focal-val {
+  font-family: monospace;
+  color: var(--clr-primary, #2a8c9a);
+  font-weight: 700;
+}
+
+.focal-spinner {
+  margin-left: 6px;
+  color: var(--clr-primary, #2a8c9a);
+}
+
+.focal-hint {
+  font-size: 11px;
+  color: #adb5bd;
+}
 
 .form-label-sm {
   display: block;
