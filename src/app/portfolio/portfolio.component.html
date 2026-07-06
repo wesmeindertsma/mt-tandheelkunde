@@ -8,22 +8,25 @@
     </div>
 
     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-      <div class="col" *ngFor="let c of cases">
-        <div class="portfolio-item" (click)="openCarousel(c.id, thumbnail(c).id)" *ngIf="c.fotos.length > 0">
-          <img [src]="thumbnail(c).src" [alt]="c.behandeling" class="portfolio-img">
-          <!-- Altijd-zichtbare titel -->
-          <div class="portfolio-titel">
-            <span>{{ c.behandeling }}</span>
-            <span *ngIf="c.fotos.length > 1" class="portfolio-titel-count">
-              <i class="bi bi-images"></i> {{ c.fotos.length }}
-            </span>
-          </div>
-          <!-- Hover overlay -->
-          <div class="portfolio-overlay">
-            <i class="bi bi-zoom-in portfolio-zoom"></i>
+      <ng-container *ngFor="let c of cases">
+        <div class="col" *ngIf="c.fotos.length > 0">
+          <div class="portfolio-item" (click)="openCarousel(c.id, currentSlide(c).id)">
+            <img [src]="currentSlide(c).src" [alt]="c.behandeling" class="portfolio-img">
+            <img [src]="nextSlide(c).src" [alt]="c.behandeling" class="portfolio-img portfolio-img-next" [class.transitioning]="slideFading[c.id]">
+            <!-- Altijd-zichtbare titel -->
+            <div class="portfolio-titel">
+              <span>{{ c.behandeling }}</span>
+              <span *ngIf="c.fotos.length > 1" class="portfolio-titel-count">
+                <i class="bi bi-images"></i> {{ c.fotos.length }}
+              </span>
+            </div>
+            <!-- Hover overlay -->
+            <div class="portfolio-overlay">
+              <i class="bi bi-zoom-in portfolio-zoom"></i>
+            </div>
           </div>
         </div>
-      </div>
+      </ng-container>
     </div>
 
   </div>
