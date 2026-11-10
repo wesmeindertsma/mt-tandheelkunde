@@ -19,8 +19,8 @@
 
           <h2 style="margin-top: 24px;">Openingstijden</h2>
           <ul>
-            <li>{{ teksten.openingstijdMa }}</li>
-            <li>{{ teksten.openingstijdDiVr }}</li>
+            <li *ngIf="teksten.openingstijdMa">{{ teksten.openingstijdMa }}</li>
+            <li *ngIf="teksten.openingstijdDiVr">{{ teksten.openingstijdDiVr }}</li>
           </ul>
         </div>
       </div>

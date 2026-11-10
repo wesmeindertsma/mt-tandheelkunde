@@ -1,6 +1,20 @@
 RewriteEngine On
 RewriteBase /
+
+# Geen automatische redirect van /portfolio naar /portfolio/ (dat zou dubbele URL's geven)
+DirectorySlash Off
+
+# /pagina/ -> /pagina (één vaste URL per pagina voor Google)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)/$ /$1 [R=301,L]
+
+# Vooraf gegenereerde pagina's: /portfolio -> /portfolio/index.html
+RewriteCond %{DOCUMENT_ROOT}/$1/index.html -f
+RewriteRule ^(.+)$ $1/index.html [L]
+
+# Overige routes (zoals /beheer) laten draaien als gewone Angular-app
 RewriteRule ^index\.html$ - [L]
+RewriteRule ^index\.csr\.html$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /index.html [L]
+RewriteRule . /index.csr.html [L]

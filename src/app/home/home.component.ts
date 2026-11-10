@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -8,9 +9,11 @@ import { ActivatedRoute } from '@angular/router';
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, @Inject(PLATFORM_ID) private platformId: object) {}
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     this.route.fragment.subscribe(fragment => {
       if (fragment) {
         // Kleine delay zodat child-componenten klaar zijn met renderen

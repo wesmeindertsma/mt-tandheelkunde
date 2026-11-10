@@ -5,7 +5,51 @@
   <title>Marynthe Tijink Tandheelkunde</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Restauratief en esthetisch gespecialiseerd tandheelkundige in Appingedam. Facings, bleken, kroon-brugwerk en slijtagebehandeling.">
+  <meta name="description" content="Tandarts Marynthe Tijink is gespecialiseerd in esthetische en restauratieve tandheelkunde: facings, bleken, kroon- en brugwerk en slijtagebehandeling in Appingedam, Groningen.">
+  <!-- Gestructureerde gegevens voor Google (praktijk, adres, behandelingen) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Dentist",
+    "@id": "https://www.mttandheelkunde.nl/#praktijk",
+    "name": "MT Tandheelkunde – Marynthe Tijink",
+    "alternateName": ["Marynthe Tijink Tandheelkunde", "MT Tandheelkunde"],
+    "description": "Tandarts gespecialiseerd in esthetische en restauratieve tandheelkunde in Appingedam, provincie Groningen.",
+    "url": "https://www.mttandheelkunde.nl/",
+    "image": "https://www.mttandheelkunde.nl/assets/img/facings/facings1.jpeg",
+    "telephone": "+31596219219",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Spoorbaan 1",
+      "postalCode": "9901 DD",
+      "addressLocality": "Appingedam",
+      "addressRegion": "Groningen",
+      "addressCountry": "NL"
+    },
+    "geo": { "@type": "GeoCoordinates", "latitude": 53.3257932, "longitude": 6.8597778 },
+    "areaServed": [
+      { "@type": "City", "name": "Appingedam" },
+      { "@type": "City", "name": "Delfzijl" },
+      { "@type": "City", "name": "Groningen" },
+      { "@type": "AdministrativeArea", "name": "Provincie Groningen" }
+    ],
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "08:00", "closes": "17:00" }
+    ],
+    "knowsAbout": ["Esthetische tandheelkunde", "Restauratieve tandheelkunde", "Facings", "Tanden bleken", "ICON witte vlekken behandeling", "Kroon- en brugwerk", "Gebitsslijtage"],
+    "employee": {
+      "@type": "Person",
+      "name": "Marynthe Tijink",
+      "jobTitle": "Tandarts",
+      "alumniOf": { "@type": "CollegeOrUniversity", "name": "Rijksuniversiteit Groningen" }
+    },
+    "containedInPlace": {
+      "@type": "Dentist",
+      "name": "PUUR Mondzorg Spoorbaan",
+      "url": "https://puurmondzorg.nl/tandarts/spoorbaan/"
+    }
+  }
+  </script>
   <link rel="icon" type="image/x-icon"   href="favicon.ico">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/png"     href="favicon.png">
@@ -18,8 +62,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Google Identity Services (OAuth2) -->
-  <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
   <app-root></app-root>

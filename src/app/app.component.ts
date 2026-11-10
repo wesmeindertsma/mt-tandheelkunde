@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { SeoService } from './services/seo.service';
 
 @Component({
   standalone: false,
@@ -11,9 +13,17 @@ import { filter } from 'rxjs/operators';
 export class AppComponent implements OnInit {
   title = 'MT-Tandheelkunde';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: object,
+    seo: SeoService,
+  ) {
+    seo.init();
+  }
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
     ).subscribe(() => {

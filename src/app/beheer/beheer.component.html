@@ -1,10 +1,14 @@
 <!-- ─── Login ─────────────────────────────────────────── -->
-<div class="beheer-login" *ngIf="!ingelogd">
+<div class="beheer-login" *ngIf="!ingelogd && !laden">
   <div class="login-card">
     <div class="login-logo">MT Tandheelkunde</div>
     <h2>Beheer</h2>
     <p class="login-sub">Log in met uw Google-account om door te gaan.</p>
-    <div id="google-signin-btn" class="google-btn-wrapper"></div>
+    <div class="google-btn-wrapper">
+      <button type="button" class="btn btn-outline-secondary btn-google" (click)="inloggen()" [disabled]="loginBusy">
+        <i class="bi bi-google me-2"></i>{{ loginBusy ? 'Bezig met inloggen…' : 'Inloggen met Google' }}
+      </button>
+    </div>
     <div class="alert alert-danger mt-3 py-2 text-center" *ngIf="loginFout">
       <i class="bi bi-shield-exclamation me-1"></i>{{ loginFout }}
     </div>
@@ -296,12 +300,12 @@
           <textarea class="form-control" rows="4" [(ngModel)]="teksten.wieIkBenPar2"></textarea>
         </div>
         <div class="mb-3">
-          <label class="form-label-sm">Openingstijden maandag</label>
-          <input class="form-control" type="text" [(ngModel)]="teksten.openingstijdMa" placeholder="bijv. Maandag: 08:00 – 21:00 uur">
+          <label class="form-label-sm">Openingstijden – regel 1</label>
+          <input class="form-control" type="text" [(ngModel)]="teksten.openingstijdMa" placeholder="bijv. Maandag t/m vrijdag: 08:00 – 17:00 uur">
         </div>
         <div class="mb-3">
-          <label class="form-label-sm">Openingstijden di t/m vrijdag</label>
-          <input class="form-control" type="text" [(ngModel)]="teksten.openingstijdDiVr" placeholder="bijv. Di t/m vrijdag: 08:00 – 17:00 uur">
+          <label class="form-label-sm">Openingstijden – regel 2 (optioneel, leeg laten = niet tonen)</label>
+          <input class="form-control" type="text" [(ngModel)]="teksten.openingstijdDiVr" placeholder="leeg laten als het niet nodig is">
         </div>
       </div>
 

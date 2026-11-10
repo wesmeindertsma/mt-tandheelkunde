@@ -1,8 +1,9 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Inject, Injectable, OnDestroy, PendingTasks, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable } from 'rxjs';
 import {
   Firestore, doc, setDoc, onSnapshot,
-  collection, query, orderBy, writeBatch, getDocs,
+  collection, query, orderBy, writeBatch, getDocs, getDoc,
 } from '@angular/fire/firestore';
 
 export interface PortfolioFotoItem {
@@ -127,8 +128,8 @@ const STANDAARD_TEKSTEN: TekstenData = {
   heroTagline: 'Restauratief en esthetisch gespecialiseerd tandheelkundige in Appingedam',
   wieIkBenPar1: 'In juli 2016 ben ik afgestudeerd als tandarts aan de Rijksuniversiteit te Groningen. Inmiddels werk ik in verschillende praktijken met als \'hoofd praktijk\' PUUR mondzorg Spoorbaan te Appingedam. De afgelopen jaren heb ik bij- en nascholing gevolgd in verschillende vakgebieden.',
   wieIkBenPar2: 'Mijn passie ligt bij de restauratieve en esthetische tandheelkunde, waarvan u op deze website verschillende voorbeelden zult vinden. Ik vind het belangrijk om kwaliteit te leveren, een passend behandelplan te maken en stel daarbij de patiënt centraal — want iedereen is uniek!',
-  openingstijdMa: 'Maandag: 08:00 – 21:00 uur',
-  openingstijdDiVr: 'Di t/m vrijdag: 08:00 – 17:00 uur',
+  openingstijdMa: 'Maandag t/m vrijdag: 08:00 – 17:00 uur',
+  openingstijdDiVr: '',
 };
 
 const LS_PORTFOLIO     = 'mt_portfolio_v1';
@@ -160,7 +161,19 @@ export class DataService implements OnDestroy {
   private unsubMeta:      (() => void) | undefined;
   private unsubPortfolio: (() => void) | undefined;
 
-  constructor(private firestore: Firestore) {
+  constructor(
+    private firestore: Firestore,
+    @Inject(PLATFORM_ID) platformId: object,
+    pendingTasks: PendingTasks,
+  ) {
+    if (!isPlatformBrowser(platformId)) {
+      // Prerendering (build): haal de actuele inhoud één keer op, zodat de
+      // gegenereerde HTML dezelfde teksten bevat als de live site. PendingTasks
+      // laat de prerenderer wachten tot de data binnen is.
+      pendingTasks.run(() => this.laadEenmalig());
+      return;
+    }
+
     // Real-time listener: behandelingen + teksten
     this.unsubMeta = onSnapshot(doc(this.firestore, 'site/data'), snap => {
       const d = snap.data();
@@ -187,6 +200,27 @@ export class DataService implements OnDestroy {
         this._portfolio$.next(cases);
       }
     );
+  }
+
+  private async laadEenmalig(): Promise<void> {
+    try {
+      const [snap, cases] = await Promise.all([
+        getDoc(doc(this.firestore, 'site/data')),
+        getDocs(query(collection(this.firestore, 'portfolioCases'), orderBy('order'))),
+      ]);
+      const d = snap.data();
+      if (Array.isArray(d?.['behandelingen'])) this._behandelingen$.next(d!['behandelingen']);
+      if (d?.['teksten']) this._teksten$.next(d['teksten']);
+      if (!cases.empty) {
+        this._portfolio$.next(cases.docs.map(c => {
+          const { order: _order, ...rest } = c.data();
+          return rest as PortfolioCase;
+        }));
+      }
+    } catch (err) {
+      // Firestore niet bereikbaar tijdens de build: val terug op de standaardteksten
+      console.warn('Prerender: Firestore-data niet geladen, standaardinhoud gebruikt.', err);
+    }
   }
 
   ngOnDestroy(): void {

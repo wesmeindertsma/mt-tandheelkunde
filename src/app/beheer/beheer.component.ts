@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, NgZone, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { BehandelingCard, DataService, PortfolioCase, PortfolioFotoItem, TekstenData } from '../services/data.service';
 
@@ -8,8 +8,10 @@ import { BehandelingCard, DataService, PortfolioCase, PortfolioFotoItem, Teksten
   templateUrl: './beheer.component.html',
   styleUrl: './beheer.component.css'
 })
-export class BeheerComponent implements OnInit, AfterViewInit {
+export class BeheerComponent implements OnInit {
   ingelogd = false;
+  laden = true;
+  loginBusy = false;
   loginFout = '';
 
   actieveTab: 'portfolio' | 'behandelingen' | 'teksten' | 'instellingen' = 'portfolio';
@@ -38,62 +40,32 @@ export class BeheerComponent implements OnInit, AfterViewInit {
   constructor(
     private authService: AuthService,
     private dataService: DataService,
-    private zone: NgZone
   ) {}
 
   get userName(): string  { return this.authService.userName; }
   get userEmail(): string { return this.authService.userEmail; }
 
-  ngOnInit(): void {
-    this.ingelogd = this.authService.isAuthenticated;
+  async ngOnInit(): Promise<void> {
+    this.ingelogd = await this.authService.gereed();
+    this.laden = false;
     if (this.ingelogd) this.laadData();
   }
 
-  ngAfterViewInit(): void {
-    if (!this.ingelogd) {
-      setTimeout(() => this.initGoogleButton(), 80);
+  async inloggen(): Promise<void> {
+    this.loginBusy = true;
+    const result = await this.authService.login();
+    this.loginBusy = false;
+    this.loginFout = result.message;
+    if (result.success) {
+      this.ingelogd = true;
+      this.laadData();
     }
   }
 
-  private initGoogleButton(): void {
-    const g = (window as any)['google'];
-    if (!g?.accounts?.id) {
-      // Script nog niet geladen, opnieuw proberen
-      setTimeout(() => this.initGoogleButton(), 400);
-      return;
-    }
-    g.accounts.id.initialize({
-      client_id: this.authService.clientId,
-      callback: (response: any) => {
-        this.zone.run(() => {
-          const result = this.authService.handleCredentialResponse(response);
-          if (result.success) {
-            this.loginFout = '';
-            this.ingelogd = true;
-            this.laadData();
-          } else {
-            this.loginFout = result.message;
-          }
-        });
-      }
-    });
-    const el = document.getElementById('google-signin-btn');
-    if (el) {
-      g.accounts.id.renderButton(el, {
-        theme: 'outline',
-        size: 'large',
-        text: 'signin_with',
-        locale: 'nl',
-        width: 280
-      });
-    }
-  }
-
-  uitloggen(): void {
-    this.authService.signOut();
+  async uitloggen(): Promise<void> {
+    await this.authService.signOut();
     this.ingelogd = false;
     this.loginFout = '';
-    setTimeout(() => this.initGoogleButton(), 80);
   }
 
   private laadData(): void {

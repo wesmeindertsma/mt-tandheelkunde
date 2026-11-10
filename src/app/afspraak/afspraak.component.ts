@@ -36,6 +36,7 @@ export class AfspraakComponent implements OnInit {
       telefoon:      ['', [Validators.required, Validators.pattern(/^[0-9\s\+\-]{8,}$/)]],
       praktijkNaam:  [''],
       patientNaam:   [''],
+      geboortedatum: ['', Validators.required],
       behandeling:   ['', Validators.required],
       datum:         [''],
       bericht:       [''],
@@ -65,6 +66,13 @@ export class AfspraakComponent implements OnInit {
     return this.f['formulierType'].value === 'doorverwijzing';
   }
 
+  /** Zet een ISO-datum (jjjj-mm-dd) om naar dd-mm-jjjj. */
+  private formatDatum(iso: string): string {
+    if (!iso) return '—';
+    const [j, m, d] = iso.split('-');
+    return `${d}-${m}-${j}`;
+  }
+
   onSubmit(): void {
     if (this.afspraakForm.invalid) {
       this.afspraakForm.markAllAsTouched();
@@ -85,6 +93,7 @@ export class AfspraakComponent implements OnInit {
           telefoon:        v.telefoon,
           praktijkNaam:    v.praktijkNaam || '—',
           patientNaam:     v.patientNaam,
+          geboortedatum:   this.formatDatum(v.geboortedatum),
           behandeling:     v.behandeling,
           datum:           v.datum || '—',
           bericht:         v.bericht || '—',
@@ -98,6 +107,7 @@ export class AfspraakComponent implements OnInit {
           telefoon:        v.telefoon,
           praktijkNaam:    '—',
           patientNaam:     '—',
+          geboortedatum:   this.formatDatum(v.geboortedatum),
           behandeling:     v.behandeling,
           datum:           v.datum || '—',
           bericht:         v.bericht || '—',

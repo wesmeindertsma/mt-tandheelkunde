@@ -1,4 +1,5 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { DataService, PortfolioCase, PortfolioFotoItem } from '../services/data.service';
 
@@ -21,7 +22,7 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   private sub!: Subscription;
   private slideTimer: any;
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService, @Inject(PLATFORM_ID) private platformId: object) {}
 
   ngOnInit(): void {
     this.sub = this.dataService.portfolio$.subscribe(cases => {
@@ -40,6 +41,8 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   }
 
   private startSlideshow(): void {
+    // Geen timers tijdens prerendering: die houden de build open
+    if (!isPlatformBrowser(this.platformId)) return;
     clearInterval(this.slideTimer);
     this.slideTimer = setInterval(() => {
       if (this.activeCaseId) return;

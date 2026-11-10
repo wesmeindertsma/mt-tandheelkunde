@@ -86,6 +86,25 @@
                 </div>
               </div>
 
+              <!-- Geboortedatum -->
+              <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                  <label class="form-label" for="geboortedatum">
+                    {{ isDoorverwijzing ? 'Geboortedatum patiënt' : 'Geboortedatum' }} <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    id="geboortedatum"
+                    type="date"
+                    class="form-control"
+                    formControlName="geboortedatum"
+                    [max]="today"
+                    [class.is-invalid]="f['geboortedatum'].invalid && f['geboortedatum'].touched">
+                  <div class="invalid-feedback">
+                    {{ isDoorverwijzing ? 'Vul de geboortedatum van de patiënt in.' : 'Vul uw geboortedatum in.' }}
+                  </div>
+                </div>
+              </div>
+
               <!-- Contactgegevens -->
               <div class="row g-3 mb-3">
                 <div class="col-sm-6">
@@ -236,8 +255,7 @@
             <div class="ci-text">
               <strong>Openingstijden</strong>
               <span>
-                Maandag: 08:00 – 21:00<br>
-                Di t/m vr: 08:00 – 17:00
+                Ma t/m vr: 08:00 – 17:00
               </span>
             </div>
           </div>

@@ -1,4 +1,5 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, Inject, OnDestroy, OnInit } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { BehandelingCard, DataService } from '../../services/data.service';
 
@@ -14,7 +15,7 @@ export class WatIkDoeComponent implements OnInit, OnDestroy {
 
   private sub!: Subscription;
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService, @Inject(DOCUMENT) private document: Document) {}
 
   ngOnInit(): void {
     this.sub = this.dataService.behandelingen$.subscribe(b => this.behandelingen = b);
@@ -22,17 +23,17 @@ export class WatIkDoeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
-    document.body.style.overflow = '';
+    this.document.body.style.overflow = '';
   }
 
   openModal(b: BehandelingCard): void {
     this.activeBehandeling = b;
-    document.body.style.overflow = 'hidden';
+    this.document.body.style.overflow = 'hidden';
   }
 
   closeModal(): void {
     this.activeBehandeling = null;
-    document.body.style.overflow = '';
+    this.document.body.style.overflow = '';
   }
 
   @HostListener('document:keydown.escape')
