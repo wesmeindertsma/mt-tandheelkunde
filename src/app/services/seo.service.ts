@@ -12,6 +12,8 @@ export interface SeoData {
   description: string;
   /** Zet op false voor pagina's die niet in Google moeten (bijv. beheer). */
   index?: boolean;
+  /** Absolute URL van de deelafbeelding; standaard een facings-foto. */
+  image?: string;
 }
 
 /**
@@ -40,8 +42,32 @@ export class SeoService {
       });
   }
 
-  private apply(seo: SeoData): void {
-    const pad = this.router.url.split(/[?#]/)[0];
+  /**
+   * Voor pagina's waarvan de titel uit de data komt (bijv. een behandeling).
+   * `pad` is het pad van de pagina, zoals "/behandelingen/facings".
+   */
+  set(seo: SeoData, pad: string): void {
+    this.apply(seo, pad);
+  }
+
+  /** Plaatst (of verwijdert, bij `null`) een blok gestructureerde gegevens in de <head>. */
+  setJsonLd(sleutel: string, data: object | null): void {
+    const id = `ld-${sleutel}`;
+    let script = this.document.getElementById(id);
+    if (!data) {
+      script?.remove();
+      return;
+    }
+    if (!script) {
+      script = this.document.createElement('script');
+      script.setAttribute('type', 'application/ld+json');
+      script.id = id;
+      this.document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(data);
+  }
+
+  private apply(seo: SeoData, pad = this.router.url.split(/[?#]/)[0]): void {
     const url = SITE_URL + (pad === '/' ? '/' : pad);
 
     this.title.setTitle(seo.title);
@@ -54,7 +80,7 @@ export class SeoService {
     this.meta.updateTag({ property: 'og:title',       content: seo.title });
     this.meta.updateTag({ property: 'og:description', content: seo.description });
     this.meta.updateTag({ property: 'og:url',         content: url });
-    this.meta.updateTag({ property: 'og:image',       content: `${SITE_URL}/assets/img/facings/facings1.jpeg` });
+    this.meta.updateTag({ property: 'og:image',       content: seo.image ?? `${SITE_URL}/assets/img/facings/facings1.jpeg` });
 
     let link = this.document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!link) {

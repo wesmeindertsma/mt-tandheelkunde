@@ -1,0 +1,73 @@
+<section class="behandeling-pagina">
+  <div class="container">
+
+    <nav class="kruimelpad" aria-label="Kruimelpad">
+      <a routerLink="/">Home</a>
+      <i class="bi bi-chevron-right" aria-hidden="true"></i>
+      <a routerLink="/" fragment="wat-ik-doe">Behandelingen</a>
+      <ng-container *ngIf="behandeling">
+        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        <span aria-current="page">{{ behandeling.titel }}</span>
+      </ng-container>
+    </nav>
+
+    <ng-container *ngIf="behandeling; else nietGevonden">
+      <div class="row g-5">
+
+        <article class="col-lg-7">
+          <span class="overline">Behandeling in Appingedam</span>
+          <h1>{{ behandeling.titel }}</h1>
+          <p class="intro" *ngIf="toonIntro">{{ behandeling.beschrijving }}</p>
+
+          <div class="blok" *ngFor="let blok of blokken">
+            <h2 *ngIf="blok.kop">{{ blok.kop }}</h2>
+            <ul *ngIf="blok.lijst; else alinea">
+              <li *ngFor="let r of blok.regels">{{ r }}</li>
+            </ul>
+            <ng-template #alinea><p *ngFor="let r of blok.regels">{{ r }}</p></ng-template>
+          </div>
+
+          <p class="auteur">
+            Behandeling door tandarts Marynthe Tijink (BIG 09921248802), PUUR Mondzorg Spoorbaan, Appingedam.
+          </p>
+        </article>
+
+        <aside class="col-lg-5">
+          <div class="zijkolom">
+            <img *ngIf="behandeling.foto" [src]="behandeling.foto"
+                 [alt]="behandeling.titel + ' door tandarts Marynthe Tijink'" class="beh-foto">
+
+            <div class="cta-kaart">
+              <h2>Interesse in deze behandeling?</h2>
+              <p>Plan een intake. Samen bekijken we uw gebit en stellen we een behandelplan met begroting op.</p>
+              <a routerLink="/afspraak" class="btn-hero-primary">
+                <i class="bi bi-calendar-check"></i> Afspraak maken
+              </a>
+              <a href="tel:+31596219219" class="cta-tel"><i class="bi bi-telephone"></i> 0596 219 219</a>
+              <a routerLink="/portfolio" class="cta-link">Bekijk voor- en na-foto's <i class="bi bi-arrow-right-short"></i></a>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+
+      <div class="andere" *ngIf="andere.length">
+        <h2>Andere behandelingen</h2>
+        <ul>
+          <li *ngFor="let a of andere">
+            <a [routerLink]="['/behandelingen', a.slug]">{{ a.titel }} <i class="bi bi-arrow-right-short"></i></a>
+          </li>
+        </ul>
+      </div>
+    </ng-container>
+
+    <ng-template #nietGevonden>
+      <div class="niet-gevonden" *ngIf="geladen">
+        <h1>Behandeling niet gevonden</h1>
+        <p>Deze pagina bestaat niet (meer). Bekijk het overzicht van alle behandelingen.</p>
+        <a routerLink="/" fragment="wat-ik-doe" class="btn-hero-primary">Naar de behandelingen</a>
+      </div>
+    </ng-template>
+
+  </div>
+</section>

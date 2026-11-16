@@ -4,6 +4,7 @@ import { HomeComponent } from './home/home.component';
 import { ContactComponent } from './components/contact/contact.component';
 import { AfspraakComponent } from './afspraak/afspraak.component';
 import { PortfolioComponent } from './portfolio/portfolio.component';
+import { BehandelingComponent } from './behandeling/behandeling.component';
 import { SeoData } from './services/seo.service';
 
 // Titels en beschrijvingen zoals ze in Google verschijnen.
@@ -38,6 +39,8 @@ const routes: Routes = [
   { path: 'contact', component: ContactComponent, data: { seo: SEO['contact'] } },
   { path: 'afspraak', component: AfspraakComponent, data: { seo: SEO['afspraak'] } },
   { path: 'portfolio', component: PortfolioComponent, data: { seo: SEO['portfolio'] } },
+  // Titel en beschrijving komen uit de behandeling zelf (zie BehandelingComponent)
+  { path: 'behandelingen/:slug', component: BehandelingComponent },
   { path: 'beheer', data: { seo: SEO['beheer'] }, loadChildren: () => import('./beheer/beheer.module').then(m => m.BeheerModule) },
 ];
 

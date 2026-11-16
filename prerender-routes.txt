@@ -2,3 +2,7 @@
 /portfolio
 /afspraak
 /contact
+/behandelingen/facings
+/behandelingen/gebitsslijtage
+/behandelingen/kroon-en-brugwerk
+/behandelingen/bleken-en-witte-vlekken

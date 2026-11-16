@@ -17,6 +17,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { ContactComponent } from './components/contact/contact.component';
 import { PortfolioComponent } from './portfolio/portfolio.component';
+import { BehandelingComponent } from './behandeling/behandeling.component';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyAB74FEHFNVs_qAxOUNW2lGjUhhwSqYjU0',
@@ -38,6 +39,7 @@ const firebaseConfig = {
     ContactComponent,
     AfspraakComponent,
     PortfolioComponent,
+    BehandelingComponent,
   ],
   imports: [
     BrowserModule,

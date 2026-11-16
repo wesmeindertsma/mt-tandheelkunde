@@ -8,8 +8,7 @@
 
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
       <div class="col" *ngFor="let b of behandelingen">
-        <div class="behandeling-card" (click)="openModal(b)" role="button" tabindex="0"
-             (keydown.enter)="openModal(b)" (keydown.space)="openModal(b)">
+        <a class="behandeling-card" [routerLink]="['/behandelingen', slug(b)]">
           <div class="behandeling-card-img">
             <img [src]="b.foto" [alt]="b.titel">
           </div>
@@ -18,25 +17,8 @@
             <p>{{ b.beschrijving }}</p>
             <span class="meer-info-link">Meer informatie <i class="bi bi-arrow-right-short"></i></span>
           </div>
-        </div>
+        </a>
       </div>
     </div>
   </div>
 </section>
-
-<!-- Modal overlay -->
-<div class="beh-modal-overlay" *ngIf="activeBehandeling" (click)="closeModal()">
-  <div class="beh-modal" (click)="$event.stopPropagation()">
-    <button class="beh-modal-close" (click)="closeModal()" aria-label="Sluiten">
-      <i class="bi bi-x-lg"></i>
-    </button>
-    <div class="beh-modal-img">
-      <img [src]="activeBehandeling.foto" [alt]="activeBehandeling.titel">
-    </div>
-    <div class="beh-modal-body">
-      <h3>{{ activeBehandeling.titel }}</h3>
-      <p class="beh-modal-intro">{{ activeBehandeling.beschrijving }}</p>
-      <div class="beh-modal-detail" *ngIf="activeBehandeling.detailTekst">{{ activeBehandeling.detailTekst }}</div>
-    </div>
-  </div>
-</div>

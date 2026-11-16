@@ -29,6 +29,21 @@ export interface BehandelingCard {
   zoom?:   number; // 0.5–2.5: zoomniveau (1 = normaal)
 }
 
+/** Vaste, korte webadressen voor de standaardbehandelingen (los van de titel in beheer). */
+const VASTE_SLUGS: Record<string, string> = {
+  facings:  'facings',
+  slijtage: 'gebitsslijtage',
+  kroon:    'kroon-en-brugwerk',
+  bleken:   'bleken-en-witte-vlekken',
+};
+
+/** Webadres-deel voor een behandeling, bijv. "kroon-en-brugwerk" in /behandelingen/kroon-en-brugwerk. */
+export function behandelingSlug(b: BehandelingCard): string {
+  return VASTE_SLUGS[b.id] ?? (b.titel || b.id)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
 export interface TekstenData {
   heroTagline: string;
   wieIkBenPar1: string;

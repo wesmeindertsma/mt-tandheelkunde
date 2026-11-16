@@ -1,7 +1,6 @@
-import { Component, HostListener, Inject, OnDestroy, OnInit } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { BehandelingCard, DataService } from '../../services/data.service';
+import { BehandelingCard, DataService, behandelingSlug } from '../../services/data.service';
 
 @Component({
   standalone: false,
@@ -11,11 +10,11 @@ import { BehandelingCard, DataService } from '../../services/data.service';
 })
 export class WatIkDoeComponent implements OnInit, OnDestroy {
   behandelingen: BehandelingCard[] = [];
-  activeBehandeling: BehandelingCard | null = null;
+  readonly slug = behandelingSlug;
 
   private sub!: Subscription;
 
-  constructor(private dataService: DataService, @Inject(DOCUMENT) private document: Document) {}
+  constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
     this.sub = this.dataService.behandelingen$.subscribe(b => this.behandelingen = b);
@@ -23,21 +22,5 @@ export class WatIkDoeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
-    this.document.body.style.overflow = '';
-  }
-
-  openModal(b: BehandelingCard): void {
-    this.activeBehandeling = b;
-    this.document.body.style.overflow = 'hidden';
-  }
-
-  closeModal(): void {
-    this.activeBehandeling = null;
-    this.document.body.style.overflow = '';
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    this.closeModal();
   }
 }

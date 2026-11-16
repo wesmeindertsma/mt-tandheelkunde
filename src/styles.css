@@ -86,22 +86,23 @@ ol, ul { list-style: none; margin: 0; padding: 0; }
   transition: var(--transition);
 }
 
-#header .logo h1 {
+#header .logo .logo-naam {
   font-family: var(--font-heading);
   font-size: 22px;
   font-weight: 700;
   letter-spacing: 0.5px;
+  line-height: 1.2;
   color: var(--clr-dark);
   margin: 0;
 }
 
-#header .logo h1 a,
-#header .logo h1 a:hover {
+#header .logo .logo-naam a,
+#header .logo .logo-naam a:hover {
   color: var(--clr-dark);
   text-decoration: none;
 }
 
-#header .logo h1 span {
+#header .logo .logo-naam span {
   color: var(--clr-primary);
 }
 
