@@ -40,3 +40,6 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Foto's die bij de build uit Firestore worden gehaald (scripts/fotos-uit-firestore.mjs)
+/public/fotos

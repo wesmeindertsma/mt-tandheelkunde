@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnDestroy, PendingTasks, PLATFORM_ID } from '@angular/core';
+import { Inject, Injectable, InjectionToken, OnDestroy, Optional, PendingTasks, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable } from 'rxjs';
 import {
@@ -28,6 +28,13 @@ export interface BehandelingCard {
   focalY?: number; // 0–100: verticale focuspositie voor object-position (auto-gedetecteerd)
   zoom?:   number; // 0.5–2.5: zoomniveau (1 = normaal)
 }
+
+/**
+ * Alleen tijdens prerenderen: welke base64-foto's als los bestand beschikbaar zijn
+ * (gemaakt door scripts/fotos-uit-firestore.mjs). Sleutel: "beh:<id>" of "pf:<caseId>/<fotoId>".
+ */
+export type FotoManifest = Record<string, { pad: string; lengte: number }>;
+export const FOTO_MANIFEST = new InjectionToken<FotoManifest>('FOTO_MANIFEST');
 
 /** Vaste, korte webadressen voor de standaardbehandelingen (los van de titel in beheer). */
 const VASTE_SLUGS: Record<string, string> = {
@@ -180,6 +187,7 @@ export class DataService implements OnDestroy {
     private firestore: Firestore,
     @Inject(PLATFORM_ID) platformId: object,
     pendingTasks: PendingTasks,
+    @Optional() @Inject(FOTO_MANIFEST) private fotoManifest: FotoManifest | null,
   ) {
     if (!isPlatformBrowser(platformId)) {
       // Prerendering (build): haal de actuele inhoud één keer op, zodat de
@@ -224,18 +232,28 @@ export class DataService implements OnDestroy {
         getDocs(query(collection(this.firestore, 'portfolioCases'), orderBy('order'))),
       ]);
       const d = snap.data();
-      if (Array.isArray(d?.['behandelingen'])) this._behandelingen$.next(d!['behandelingen']);
+      if (Array.isArray(d?.['behandelingen'])) {
+        const lijst = d!['behandelingen'] as BehandelingCard[];
+        this._behandelingen$.next(lijst.map(b => ({ ...b, foto: this.fotoBestand(`beh:${b.id}`, b.foto) })));
+      }
       if (d?.['teksten']) this._teksten$.next(d['teksten']);
       if (!cases.empty) {
         this._portfolio$.next(cases.docs.map(c => {
           const { order: _order, ...rest } = c.data();
-          return rest as PortfolioCase;
+          const pc = rest as PortfolioCase;
+          return { ...pc, fotos: pc.fotos.map(f => ({ ...f, src: this.fotoBestand(`pf:${pc.id}/${f.id}`, f.src) })) };
         }));
       }
     } catch (err) {
       // Firestore niet bereikbaar tijdens de build: val terug op de standaardteksten
       console.warn('Prerender: Firestore-data niet geladen, standaardinhoud gebruikt.', err);
     }
+  }
+
+  /** Vervangt een base64-foto door het losse bestand uit de build, als dat precies dezelfde foto is. */
+  private fotoBestand(sleutel: string, src: string): string {
+    const item = this.fotoManifest?.[sleutel];
+    return item && src?.startsWith('data:') && src.length === item.lengte ? item.pad : src;
   }
 
   ngOnDestroy(): void {
