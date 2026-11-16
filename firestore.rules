@@ -1,0 +1,35 @@
+rules_version = '2';
+
+// Beveiliging van de Firestore-database van mttandheelkunde.nl
+// - Iedereen mag de inhoud van de website lezen (nodig om de site te tonen).
+// - Alleen ingelogde beheerders (Google-account, via Firebase Authentication) mogen schrijven.
+// - Alles wat hier niet genoemd wordt, is dicht.
+//
+// LET OP: houd de e-maillijst gelijk aan src/app/beheer/beheer.config.ts.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isBeheerder() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+          'msmtijink@gmail.com',
+          'wesmeindertsma@gmail.com'
+        ];
+    }
+
+    match /site/data {
+      allow read: if true;
+      allow write: if isBeheerder();
+    }
+
+    match /portfolioCases/{caseId} {
+      allow read: if true;
+      allow write: if isBeheerder();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
